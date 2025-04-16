@@ -1,54 +1,101 @@
 import { createVuetify } from 'vuetify'
-import 'vuetify/styles' // Asegúrate de importar los estilos de Vuetify
-import '@mdi/font/css/materialdesignicons.css' // Importar los íconos de Material Design
+import { es } from 'vuetify/locale'
+import 'vuetify/styles'
+import '@mdi/font/css/materialdesignicons.css'
+
 import * as components from 'vuetify/components'
 import * as directives from 'vuetify/directives'
+import * as labs from 'vuetify/labs/components'
 
-// Configuración de Vuetify con tema personalizado
 const vuetify = createVuetify({
-  components,
+  components: {
+    ...components,
+    ...labs, // Añade todos los componentes de labs
+  },
   directives,
+  locale: {
+    locale: 'es',
+    messages: { es },
+  },
   theme: {
-    defaultTheme: 'light', // Establece el tema por defecto (puede ser 'light' o 'dark')
+    defaultTheme: 'light',
     themes: {
       light: {
-        // Colores para el tema claro
         colors: {
-          primary: '#2a2a2a', // Color primario
-          secondary: '#03DAC6', // Color secundario
-          background: '#FFFFFF', // Fondo blanco
-          surface: '#F5F5F5', // Superficie de los elementos (tarjetas, botones, etc.)
-          error: '#B00020', // Color de error
-          info: '#2196F3', // Color de info
-          success: '#4CAF50', // Color de éxito
-          warning: '#FB8C00', // Color de advertencia
-          onPrimary: '#FFFFFF', // Color del texto sobre el fondo primario
-          onSecondary: '#000000', // Color del texto sobre el fondo secundario
-          onBackground: '#000000', // Color del texto sobre el fondo
-          onSurface: '#000000', // Color del texto sobre la superficie
-        },
-        variables: {
-          fontFamily: 'Roboto Flex, sans-serif',
+          primary: '#8c57ff',
+          border: '#e6e5e7',
+          'background-list': '#e3d7ff',
+          'on-primary': '#ffffff',
+          'primary-darken-1': '#7e4ee6',
+          secondary: '#8a8d93',
+          'secondary-darken-1': '#7c7f84',
+          'on-secondary': '#ffffff',
+          success: '#56ca00',
+          'success-darken-1': '#4db600',
+          'on-success': '#ffffff',
+          info: '#16b1ff',
+          'info-darken-1': '#149fe6',
+          'on-info': '#ffffff',
+          warning: '#ffb400',
+          'warning-darken-1': '#e6a200',
+          'on-warning': '#ffffff',
+          error: '#ff4c51',
+          'error-darken-1': '#e64449',
+          'on-error': '#ffffff',
+          background: '#f4f5fa',
+          'on-background': '#2e263d',
+          surface: '#ffffff',
+          'on-surface': '#2e263d',
+          'th-grey-50': '#fafafa',
+          'th-grey-100': '#f5f5f5',
+          'th-grey-200': '#eeeeee',
+          'th-grey-300': '#e0e0e0',
+          'th-grey-400': '#bdbdbd',
+          'th-grey-500': '#9e9e9e',
+          'th-grey-600': '#757575',
+          'th-grey-700': '#616161',
+          'th-grey-800': '#424242',
+          'th-grey-900': '#212121',
+          'tooltip-background': 'transparent',
         },
       },
       dark: {
-        // Colores para el tema oscuro
         colors: {
-          primary: '#03DAC6', // Color primario (invertido en tema oscuro)
-          secondary: '#6200EA', // Color secundario (invertido en tema oscuro)
-          background: '#121212', // Fondo oscuro
-          surface: '#333333', // Superficie más oscura
-          error: '#CF6679', // Color de error
-          info: '#2196F3', // Color de info
-          success: '#4CAF50', // Color de éxito
-          warning: '#FB8C00', // Color de advertencia
-          onPrimary: '#000000', // Color del texto sobre el fondo primario
-          onSecondary: '#FFFFFF', // Color del texto sobre el fondo secundario
-          onBackground: '#FFFFFF', // Color del texto sobre el fondo
-          onSurface: '#FFFFFF', // Color del texto sobre la superficie
-        },
-        variables: {
-          fontFamily: 'Roboto Flex, sans-serif',
+          primary: '#7e4ee6',
+          border: '#474461',
+          'background-list': '#463776',
+          'on-primary': '#ffffff',
+          'primary-darken-1': '#7e4ee6',
+          secondary: '#8a8d93',
+          'secondary-darken-1': '#7c7f84',
+          'on-secondary': '#ffffff',
+          success: '#56ca00',
+          'success-darken-1': '#4db600',
+          'on-success': '#ffffff',
+          info: '#16b1ff',
+          'info-darken-1': '#149fe6',
+          'on-info': '#ffffff',
+          warning: '#ffb400',
+          'warning-darken-1': '#e6a200',
+          'on-warning': '#ffffff',
+          error: '#ff4c51',
+          'error-darken-1': '#e64449',
+          'on-error': '#ffffff',
+          background: '#312d4b',
+          'on-background': '#e7e3fc',
+          surface: '#312d4b',
+          'on-surface': '#e7e3fc',
+          'th-grey-50': '#2a2e42',
+          'th-grey-100': '#2f3349',
+          'th-grey-200': '#4a5072',
+          'th-grey-300': '#5e6692',
+          'th-grey-400': '#7983bb',
+          'th-grey-500': '#8692d0',
+          'th-grey-600': '#aab3de',
+          'th-grey-700': '#b6bee3',
+          'th-grey-800': '#cfd3ec',
+          'th-grey-900': '#e7e9f6',
+          'tooltip-background': 'transparent',
         },
       },
     },

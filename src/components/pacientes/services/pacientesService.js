@@ -2,7 +2,7 @@ import axios from '../../../config/axios'
 
 export const fetchPacientes = async () => {
   try {
-    const response = await axios.get('/Adminpacientes')
+    const response = await axios.get('/pacientes')
     return response.data
   } catch (error) {
     console.error('Error al obtener pacientes:', error)
@@ -12,7 +12,7 @@ export const fetchPacientes = async () => {
 
 export const fetchPacienteId = async (id) => {
   try {
-    const response = await axios.get(`/Adminpacientes/${id}`)
+    const response = await axios.get(`/pacientes/${id}`)
     return response.data
   } catch (error) {
     console.error('Error al obtener el paciente:', error)
@@ -22,7 +22,7 @@ export const fetchPacienteId = async (id) => {
 
 export const savePaciente = async (paciente) => {
   try {
-    const response = await axios.post('/Adminpacientes', paciente)
+    const response = await axios.post('/pacientes', paciente)
     return response.data
   } catch (error) {
     console.error('Error al guardar el paciente:', error)
@@ -32,7 +32,7 @@ export const savePaciente = async (paciente) => {
 
 export const deletePaciente = async (id) => {
   try {
-    const response = await axios.delete(`/Adminpacientes/${id}`)
+    const response = await axios.delete(`/pacientes/${id}`)
     return response.data
   } catch (error) {
     console.error('Error al eliminar el paciente:', error)
@@ -42,7 +42,7 @@ export const deletePaciente = async (id) => {
 
 export const updatePaciente = async (id, paciente) => {
   try {
-    const response = await axios.put(`/Adminpacientes/${id}`, paciente)
+    const response = await axios.put(`/pacientes/${id}`, paciente)
     return response.data
   } catch (error) {
     console.error('Error al actualizar el paciente:', error)

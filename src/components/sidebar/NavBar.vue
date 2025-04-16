@@ -6,6 +6,11 @@
     :mini-variant="isMini"
     @mouseenter="isMini = false"
     @mouseleave="isMini = true"
+    :style="{
+      backgroundColor: theme.global.current.value.colors.background,
+      color: theme.global.current.value.colors['on-background'],
+      borderRight: `1px solid ${theme.global.current.value.colors.border}`,
+    }"
   >
     <v-list class="mt-10" nav>
       <v-list-item
@@ -37,6 +42,9 @@ import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { getMenuItems } from './logic/menuItems.ts'
 import { useAuth } from '../../composables/useAuth.ts'
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
 
 const { logout } = useAuth()
 

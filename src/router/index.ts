@@ -8,6 +8,11 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../views/LoginView.vue'), // Lazy-loaded
   },
   {
+    path: '/createuser',
+    name: 'createuser',
+    component: () => import('../components/auth/SingUp.vue'),
+  },
+  {
     path: '/home',
     name: 'home',
     component: import('../views/HomeView.vue'),
@@ -22,15 +27,16 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/turnos',
     name: 'turnos',
-    component: () => import('../components/calendarioTurnos.vue'),
+    component: () => import('../components/Calendar/ToastCalendar.vue'),
     meta: { requiresAuth: true },
   },
   {
     path: '/notifi',
     name: 'notifi',
-    component: () => import('../components/Mynotificaciones.vue'),
+    component: () => import('../components/MyNotificaciones.vue'),
     meta: { requiresAuth: true },
   },
+
   {
     path: '/pacientes',
     name: 'pacientes',
@@ -40,7 +46,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/consultorios',
     name: 'consultorios',
-    component: () => import('../views/ConsultoriosView.vue'),
+    component: () => import('../views/ConsultorioView.vue'),
     meta: { requiresAuth: true },
   },
   {

@@ -1,12 +1,14 @@
 <template>
   <v-text-field
+    density="compact"
+    clearable
+    variant="outlined"
     :label="label"
-    :prepend-icon="icon"
+    :prepend-inner-icon="icon"
     :rules="rules"
     :type="type"
-    :value="modelValue"
-    @input="updateModelValue"
-    :placeholder="placeholder"
+    :model-value="modelValue"
+    @update:model-value="$emit('update:modelValue', $event)"
   ></v-text-field>
 </template>
 
@@ -42,10 +44,7 @@ defineProps({
 })
 
 // Definir el evento para la actualización del valor del modelo
-const emit = defineEmits(['update:modelValue'])
+defineEmits(['update:modelValue'])
 
 // Emitir el evento de actualización
-const updateModelValue = (value) => {
-  emit('update:modelValue', value)
-}
 </script>

@@ -1,12 +1,24 @@
 <template>
   <v-container>
     <v-row>
-      <v-toolbar title="Gestión de Pacientes">
+      <v-toolbar
+        :style="{
+          backgroundColor: theme.global.current.value.colors.surface,
+          color: theme.global.current.value.colors['on-background'],
+          border: `1px solid ${theme.global.current.value.colors.border}`,
+          borderRadius: '0.5rem 0.5rem 0 0',
+        }"
+        class="pa-5"
+      >
+        <v-toolbar-title class="text-h5">Gestión de Pacientes</v-toolbar-title>
         <v-btn
           icon="mdi-account-plus"
           class="ml-2 mr-7"
           @click="abrirDialogAgregar"
-          style="background-color: #2b81d6; color: white"
+          :style="{
+            backgroundColor: theme.global.current.value.colors.primary,
+            color: theme.global.current.value.colors['on-primary'],
+          }"
         ></v-btn>
       </v-toolbar>
     </v-row>
@@ -33,6 +45,9 @@
 <script lang="ts" setup>
 import { ref, onMounted } from 'vue'
 import { useDialog } from '../../composables/useDialog'
+import { useTheme } from 'vuetify'
+
+const theme = useTheme()
 
 // Importar los componentes
 import TablaPacientes from './TablaPacientes.vue'
@@ -41,7 +56,7 @@ import DialogPaciente from './DialogPaciente.vue'
 // Importar los servicios
 import {
   fetchPacientes,
-  fetchPacienteId,
+  // fetchPacienteId,
   savePaciente,
   deletePaciente,
   updatePaciente,
@@ -70,7 +85,7 @@ const {
 } = useDialog()
 
 //Metodos
-const abrirDialogAgregar = (paciente = null) => {
+const abrirDialogAgregar = () => {
   abrirDialog() // Pasar los datos del paciente al abrir el diálogo
 }
 

@@ -5,14 +5,20 @@
     :items="pacientes"
     class="elevation-2"
     no-data-text="No hay pacientes registrados."
+    :style="{
+      backgroundColor: theme.global.current.value.colors.background,
+      color: theme.global.current.value.colors['on-background'],
+      border: `1px solid ${theme.global.current.value.colors.border}`,
+    }"
   >
     <template v-slot:item.actions="{ item }">
+      <!-- Botón para editar y eliminar -->
       <v-icon class="me-2" size="small" @click="abrirDialogEditar(item)">mdi-pencil</v-icon>
-      <!-- Botón que dispara el diálogo -->
       <v-icon size="small" @click="abrirDialogEliminar(item)">mdi-delete</v-icon>
     </template>
   </v-data-table>
-  <!-- Dialogo de Confirmación -->
+
+  <!-- Diálogo de Confirmación -->
   <v-dialog v-model="dialogVisible" max-width="900">
     <DialogoConfirmacion
       :paciente="pacienteSeleccionado"
@@ -22,44 +28,66 @@
   </v-dialog>
 </template>
 
-<script setup>
+<script setup lang="ts">
 import { ref } from 'vue'
 import { headers } from './constants/headers'
+import { useTheme } from 'vuetify'
 import DialogoConfirmacion from './DialogoConfirmacion.vue'
 
-// Props y eventos
+const theme = useTheme()
+// Define el tipo de "pacientes" que es un arreglo de objetos
+interface Paciente {
+  id_paciente: number
+  nombre: string
+  edad: number
+  direccion: string
+  telefono: string
+}
+
 defineProps({
   pacientes: {
-    type: Array,
+    type: Array as () => Paciente[],
     required: true,
   },
 })
 
 const emit = defineEmits(['abrir-dialog-editar', 'eliminar-paciente'])
 
-// Estados
-const dialogVisible = ref(false) // Controla la visibilidad del diálogo
-const pacienteSeleccionado = ref(null) // Paciente a eliminar
+const dialogVisible = ref(false)
+const pacienteSeleccionado = ref<Paciente | null>(null)
 
-// Funciones
-const abrirDialogEditar = (item) => {
+const abrirDialogEditar = (item: Paciente) => {
   emit('abrir-dialog-editar', item)
 }
 
-const abrirDialogEliminar = (item) => {
-  pacienteSeleccionado.value = item // Guardar el paciente seleccionado
-  dialogVisible.value = true // Abrir el diálogo
+const abrirDialogEliminar = (item: Paciente) => {
+  pacienteSeleccionado.value = item
+  dialogVisible.value = true
 }
 
 const confirmarEliminar = () => {
   if (pacienteSeleccionado.value) {
-    emit('eliminar-paciente', pacienteSeleccionado.value.id_paciente) // Emitir evento
+    emit('eliminar-paciente', pacienteSeleccionado.value.id_paciente)
   }
-  cerrarDialog() // Cerrar el diálogo
+  cerrarDialog()
 }
 
 const cerrarDialog = () => {
-  dialogVisible.value = false // Ocultar el diálogo
-  pacienteSeleccionado.value = null // Limpiar selección
+  dialogVisible.value = false
+  pacienteSeleccionado.value = null
 }
 </script>
+
+<style scoped>
+/* Estilos para los iconos y las celdas */
+.v-data-table td {
+  padding: 10px;
+}
+.v-icon {
+  cursor: pointer;
+}
+:deep(.v-data-table__th) {
+  background-color: v-bind('theme.global.current.value.colors.surface');
+  color: v-bind('theme.global.current.value.colors["on-background"]') !important;
+}
+</style>
