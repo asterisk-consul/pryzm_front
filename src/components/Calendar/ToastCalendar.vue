@@ -147,7 +147,7 @@ import {
   Paciente,
   ViewType,
   Evento,
-} from '../../interfaces/models'
+} from '../../interfaces/'
 import { formatDate, formatTime } from '@/utils/formatDateTime'
 
 // CONFIG CALENDARIO
