@@ -1,16 +1,15 @@
 import axios from '@/config/axios'
-import { Ref } from 'vue'
+// import { Ref } from 'vue'
 import { Turno } from '@/interfaces/turnosInterface'
 
-export const useServiceTurnos = (turnos: Ref<Turno[]>) => {
-  const cargarTurnos = async () => {
+export const useServiceTurnos = () => {
+  const getTurnos = async (): Promise<Turno[]> => {
     try {
       const response = await axios.get('/turnos')
-      turnos.value = response.data
-      return response.data
+      return response.data // Retorna directamente los datos
     } catch (error) {
       console.error('Error al obtener turnos:', error)
-      throw error
+      throw error // Propaga el error para manejarlo en el store
     }
   }
   const getCalendarTurnos = async () => {
@@ -64,7 +63,7 @@ export const useServiceTurnos = (turnos: Ref<Turno[]>) => {
   }
 
   return {
-    cargarTurnos,
+    getTurnos,
     cargarTurnosId,
     guardarTurno,
     updateTurno,

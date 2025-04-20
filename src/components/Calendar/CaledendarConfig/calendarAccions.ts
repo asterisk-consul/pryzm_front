@@ -1,5 +1,5 @@
 import type { Ref } from 'vue'
-import type { CalendarView, ViewType, CalendarRef } from '@/interfaces/models'
+import type { CalendarView, ViewType, CalendarRef } from '@/interfaces/calendarInterface'
 
 export function useCalendarActions(
   calendarRef: Ref<CalendarRef | null>,

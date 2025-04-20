@@ -1,7 +1,8 @@
 import { computed } from 'vue'
 import type { Ref } from 'vue'
 import { darkenColor, lightenColor } from '@/utils/colorUtils'
-import type { Turno, Calendar, FormattedEvent } from '@/interfaces/models'
+import type { Turno } from '@/interfaces/turnosInterface'
+import type { Calendar, FormattedEvent } from '@/interfaces/calendarInterface'
 
 export function useCalendarEvents(turnos: Ref<Turno[]>, consultorioFiltro: Ref<string[]>) {
   const consultoriosDisponibles = computed(() => {

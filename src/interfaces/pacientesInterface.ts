@@ -7,4 +7,5 @@ export interface Paciente {
   telefono: string
   email: string
   direccion: string
+  estado: string
 }

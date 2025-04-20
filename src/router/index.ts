@@ -33,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/notifi',
     name: 'notifi',
-    component: () => import('../components/MyNotificaciones.vue'),
+    component: () => import('../components/Notificaciones/MyNotificaciones.vue'),
     meta: { requiresAuth: true },
   },
 

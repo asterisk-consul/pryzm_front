@@ -1,12 +1,16 @@
 import axios from '@/config/axios'
-import { Consultorio, Paciente, Turno, ConsultorioFromAPI, Tratamiento } from '@/interfaces/models'
+import { Consultorio } from '@/interfaces/consultorioInterface'
+import { Paciente } from '@/interfaces/pacientesInterface'
+import { Turno } from '@/interfaces/turnosInterface'
+import { Tratamiento } from '@/interfaces/tratamientosInterface'
 import { Ref } from 'vue'
+
 /**
  * Hook para manejar los servicios de la aplicación.
  */
 export const useService = (
   pacientes: Ref<Paciente[]>,
-  turnos: Ref<Turno[]>,
+  // turnos: Ref<Turno[]>,
   consultorios: Ref<Consultorio[]>,
   isEdit: Ref<boolean>,
   nuevoTurno: Ref<Turno>,
@@ -16,15 +20,6 @@ export const useService = (
   /**
    * Servicio para cargar los turnos del calendario.
    */
-  const cargarTurnos = async () => {
-    try {
-      const response = await axios.get('/turnos/calendario')
-      turnos.value = response.data
-    } catch (error) {
-      console.error('Error al cargar turnos:', error)
-      throw error // Propaga el error para manejarlo en el componente si es necesario
-    }
-  }
 
   /**
    * Servicio para cargar la lista de pacientes.
@@ -45,25 +40,27 @@ export const useService = (
    */
   const fetchConsultoriosyTratamientos = async () => {
     try {
-      const response = await axios.get<ConsultorioFromAPI[]>('/consultorios/tratamientos')
+      const response = await axios.get<Consultorio[]>('/consultorios/tratamientos')
       consultorios.value = response.data
-        .map((consultorio: ConsultorioFromAPI) => ({
+        .map((consultorio: Consultorio) => ({
           id_consultorio: consultorio.id_consultorio,
           nombre: consultorio.nombre_consultorio,
-          tratamiento: consultorio.id_tratamiento
+          tratamiento: consultorio.tratamientos
             ? [
                 {
-                  id_tratamiento: consultorio.id_tratamiento,
-                  nombre: consultorio.nombre_tratamiento,
-                  descripcion: consultorio.descripcion_tratamiento,
-                  costo: consultorio.costo_tratamiento,
-                  duracion: consultorio.duracion_tratamiento,
-                  color: consultorio.color_tratamiento,
+                  id_tratamiento: consultorio.tratamientos[0].id_tratamiento,
+                  nombre: consultorio.tratamientos[0].nombre,
+                  descripcion: consultorio.tratamientos[0].descripcion,
+                  costo: consultorio.tratamientos[0].costo,
+                  duracion: consultorio.tratamientos[0].duracion,
+                  color: consultorio.tratamientos[0].color,
                 },
               ]
             : [],
           displayText: `${consultorio.nombre_consultorio} - ${
-            consultorio.id_tratamiento ? consultorio.nombre_tratamiento : 'Sin tratamiento'
+            consultorio.tratamientos[0].id_tratamiento
+              ? consultorio.tratamientos[0].nombre
+              : 'Sin tratamiento'
           }`,
         }))
         .sort((a, b) => a.id_consultorio - b.id_consultorio)
@@ -109,7 +106,6 @@ export const useService = (
 
   // Retornamos un objeto con todos los servicios
   return {
-    cargarTurnos,
     cargarPacientes,
     fetchConsultoriosyTratamientos,
     cargarTratamientosPorConsultorio,

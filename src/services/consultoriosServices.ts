@@ -52,7 +52,7 @@ export const useServiceConsultorios = () => {
   const fetchConsultoriosyTratamientos = async (consultorios: Ref<Consultorio[]>) => {
     try {
       const response = await axios.get('/consultorios/tratamientos')
-      console.log(response)
+      // console.log(response)
       // Add null/undefined checks and provide fallbacks
       consultorios.value = (response.data || [])
         .map((consultorio: Consultorio) => ({
@@ -85,6 +85,28 @@ export const useServiceConsultorios = () => {
       console.error('Error fetching tratamientos:', error)
     }
   }
+  const fetchTratamientosPorConsultorio = async (
+    id_consultorio: number,
+  ): Promise<Tratamiento[]> => {
+    try {
+      const response = await axios.get(`/tratamientos/tratamientosconsul/${id_consultorio}`)
+
+      // Transforma la respuesta para cambiar nombre_tratamiento a nombre
+      const tratamientos =
+        response.data?.map((tratamiento) => ({
+          ...tratamiento,
+          nombre: tratamiento.nombre_tratamiento, // Mapea nombre_tratamiento a nombre
+          // Elimina el campo nombre_tratamiento si lo deseas (opcional)
+          // nombre_tratamiento: undefined
+        })) || []
+
+      console.log('Tratamientos por consultorio:', tratamientos)
+      return tratamientos
+    } catch (error) {
+      console.error('Error al cargar tratamientos por consultorio:', error)
+      return []
+    }
+  }
 
   return {
     addConsultorio,
@@ -92,5 +114,6 @@ export const useServiceConsultorios = () => {
     deleteConsultorio,
     fetchConsultoriosyTratamientos,
     fetchTratamientos,
+    fetchTratamientosPorConsultorio,
   }
 }
