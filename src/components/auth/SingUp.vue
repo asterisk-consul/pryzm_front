@@ -64,7 +64,7 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import MyAlerts from '../MyAlerts.vue'
+import MyAlerts from '../Alertas/MyAlerts.vue'
 import BaseInput from './form/BaseInput.vue'
 import { signupFields } from './form/logic/formSingUp'
 import axios from 'axios'

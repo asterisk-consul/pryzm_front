@@ -116,7 +116,7 @@ const formData = computed(() => ({
 }))
 
 const createConsultorio = () => {
-  console.log('Datos del formulario:', formData.value)
+  // console.log('Datos del formulario:', formData.value)
   emit('submit', formData.value)
 }
 

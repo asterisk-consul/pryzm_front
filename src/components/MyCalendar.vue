@@ -499,6 +499,66 @@
       </v-card-actions>
     </v-card>
   </v-dialog>
+  <!-- Diálogo para mostrar todos los turnos del día -->
+  <v-dialog v-model="dialogDia" max-width="600">
+    <v-card>
+      <v-card-title> Turnos del día: {{ selectedDate }} </v-card-title>
+      <v-card-text>
+        <!-- Lista de eventos del día -->
+        <v-list>
+          <v-list-item v-for="(event, index) in eventsOfDay" :key="index">
+            <v-list-item-content>
+              <v-list-item-title>
+                {{ event.nombre_paciente }} {{ event.apellido_paciente }}
+              </v-list-item-title>
+              <v-list-item-subtitle>
+                <strong>Tratamiento:</strong> {{ event.nombre_tratamiento }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong>Hora:</strong> {{ formatTime(event.start) }} -
+                {{ formatTime(event.end) }}
+              </v-list-item-subtitle>
+              <v-list-item-subtitle>
+                <strong>Consultorio:</strong>
+                {{ event.nombre_consultorio || 'Sin consultorio' }}
+              </v-list-item-subtitle>
+            </v-list-item-content>
+            <v-list-item-action>
+              <v-chip
+                :color="event.colorLigth"
+                :style="{
+                  color: event.colorDark,
+                }"
+                dark
+                small
+              >
+                {{ event.nombre_tratamiento }}
+              </v-chip>
+            </v-list-item-action>
+          </v-list-item>
+        </v-list>
+      </v-card-text>
+      <v-card-actions>
+        <v-btn color="primary" @click="dialogDia = false">Cerrar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
+
+  <v-dialog v-model="elimiarTurno" max-width="600">
+    <v-card>
+      <v-toolbar flat height="50px" tile dark color="red">
+        <v-toolbar-title> Eliminar Turno </v-toolbar-title>
+      </v-toolbar>
+      <v-card-text class="text-h6 font-weight-bold my-2">
+        ¿Estás seguro de que deseas eliminar este turno?
+      </v-card-text>
+      <v-card-actions>
+        <v-spacer></v-spacer>
+        <v-btn color="red" text @click="elimiarTurno = false">Cancelar</v-btn>
+        <v-btn color="green" text @click="eliminarTurno">Aceptar</v-btn>
+      </v-card-actions>
+    </v-card>
+  </v-dialog>
 
   <v-navigation-drawer
     v-model="configCob"

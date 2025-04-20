@@ -1,9 +1,7 @@
 <template>
   <v-row justify="space-between" class="mx-4 my-2">
     <h3>Listado de Tratamientos</h3>
-    <v-btn outlined color="primary" dark @click="handleCreateTratamiento"
-      >+ Agregar Tratamiento</v-btn
-    >
+    <CrearButton @click="handleCreateTratamiento" text="+ Agregar Tratamiento" />
   </v-row>
   <v-row cols="12" md="4">
     <CardTratamientos
@@ -63,6 +61,7 @@ const { addTratamiento, eliminarTratamiento, updateTratamiento } = useServiceTra
 import CardTratamientos from './CardTratamientos.vue'
 import DialogCrearEditar from './DialogCrearEditar.vue'
 import DialogEliminar from './DialogEliminar.vue'
+import CrearButton from '../buttons/CrearButton.vue'
 
 // Propiedades
 const props = defineProps<{

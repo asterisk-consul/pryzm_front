@@ -2,7 +2,7 @@
   <v-col cols="12">
     <v-row justify="space-between" class="mx-4 my-2">
       <h3>Listado de Consultorios</h3>
-      <v-btn outlined color="primary" dark @click="abrirDialogoCrear">+ Agregar Consultorio</v-btn>
+      <CrearButton @click="abrirDialogoCrear" text="+ Agregar Consultorio" />
     </v-row>
     <v-row justify="center" width="100%">
       <v-slide-group v-model="model" class="pa-4" show-arrows>
@@ -40,21 +40,14 @@
     />
   </v-dialog>
   <!--  dialog para eliminar-->
-  <v-dialog
+  <ConfirmDialog
     v-model="dialogs.eliminar"
-    scrollable
-    persistent
-    :overlay="false"
-    max-width="500px"
-    transition="dialog-transition"
-  >
-    <DialogEliminar
-      :consultorio-activo="consultorioActivo"
-      @confirmar-eliminacion="confirmarEliminacion"
-      @cerrar-dialogo="dialogs.eliminar = false"
-    />
-  </v-dialog>
-
+    :entity="consultorioActivo"
+    entity-name="el consultorio"
+    title="Eliminar Consultorio"
+    confirm-text="Confirmar"
+    @confirm="confirmarEliminacion"
+  />
   <v-dialog
     v-model="dialogs.tratamientos"
     scrollable
@@ -89,9 +82,10 @@ const { addConsultorio, updateConsultorio, deleteConsultorio, fetchConsultoriosy
 // Componentes
 // import { useTheme } from 'vuetify'
 import CardConsultorio from './CardConsultorio.vue'
-import DialogEliminar from './DialogEliminar.vue'
 import DialogTratamientos from './DialogTratamientos.vue'
 import DialogCrearEditar from './DialogCrearEditar.vue'
+import CrearButton from '../buttons/CrearButton.vue'
+import ConfirmDialog from '@/components/Dialogs/DialogEliminar.vue'
 // import { formatDate } from '../../utils/formatDateTime'
 // const theme = useTheme()
 
@@ -126,6 +120,7 @@ const abrirDialogoTratamientos = (consultorio: Consultorio) => {
 const abrirDialogoBorrar = (consultorio: Consultorio) => {
   consultorioActivo.value = consultorio
   dialogs.value.eliminar = true
+  console.log('Consultorio a eliminar:', dialogs.value.eliminar)
 }
 
 const abrirDialogoCrear = () => {

@@ -132,7 +132,7 @@
 <script setup lang="ts">
 import { ref, onMounted, computed } from 'vue'
 import { useTheme } from 'vuetify'
-import axios from '../config/axios'
+import axios from '../../config/axios'
 
 const theme = useTheme()
 

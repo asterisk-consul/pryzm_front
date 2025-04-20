@@ -25,6 +25,7 @@ export interface Evento {
   borderColor?: string
   customStyle?: Partial<CSSStyleDeclaration>
   raw?: Record<string, unknown>
+  id_consultorio?: number
 }
 
 export interface FormattedEvent {
@@ -52,7 +53,8 @@ export interface CalendarInstance {
   today: () => void
   changeView: (view: ViewType) => void
   getDate: () => Date
-  setOptions: (options: any, silent?: boolean) => void
+  setDate: (date: Date) => void
+  setOptions: (options: Calendar, silent?: boolean) => void
   // ... otros métodos que uses
 }
 export type CalendarView = 'month' | 'week' | 'day' | 'list'

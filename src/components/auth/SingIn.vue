@@ -88,7 +88,7 @@
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
 import { emailRules, passwordRules } from '../../utils/validationRules'
-import MyAlerts from '../MyAlerts.vue'
+import MyAlerts from '../Alertas/MyAlerts.vue'
 import axiosInstance from '../../config/axios'
 import { useAuth } from '../../composables/useAuth.js'
 import { useRouter } from 'vue-router'
