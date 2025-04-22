@@ -54,6 +54,7 @@ const viewOptions: ViewOption[] = [
 const handleChange = (newView: ViewType) => {
   if (newView !== 'list') {
     calendarStore.handleViewChange(newView)
+    localStorage.setItem('calendar_view', newView)
   }
 }
 </script>
