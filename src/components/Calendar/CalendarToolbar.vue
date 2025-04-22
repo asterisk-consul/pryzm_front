@@ -22,7 +22,13 @@
       icon="mdi-chevron-right"
     />
 
-    <span class="text-capitalize">
+    <span
+      class="text-capitalize"
+      :style="{
+        fontSize: '1.7rem',
+        color: theme.global.current.value.colors['th-grey-800'],
+      }"
+    >
       {{ formattedDate }}
     </span>
   </div>

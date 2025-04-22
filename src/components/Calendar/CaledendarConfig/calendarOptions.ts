@@ -24,18 +24,12 @@ export function useCalendarOptions() {
     visibleWeeksCount: 6,
     isAlways6Weeks: true,
     visibleEventCount: 4,
-    narrowWeekend: true,
-    workweek: true,
   }))
 
   const weekOptions = computed(() => ({
     startDayOfWeek: 1,
     dayNames: ['DOM', 'LUN', 'MAR', 'MIE', 'JUE', 'VIE', 'SAB'],
-    narrowWeekend: true,
-    workweek: true,
     showNowIndicator: true,
-    hourStart: 7,
-    hourEnd: 22,
     taskView: false,
     eventView: ['time'],
     calendars: [],
@@ -87,7 +81,13 @@ export function useCalendarOptions() {
       const minutes = time.getMinutes()
       return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`
     },
-
+    weekDayName(model) {
+      const dateObj = model.dateInstance.d
+      const day = dateObj.getDate()
+      const month = dateObj.getMonth() + 1
+      const dayName = model.dayName.charAt(0).toUpperCase() + model.dayName.slice(1).toLowerCase()
+      return `<span style="font-weight: bold; font-size: 1.2rem">${day}/${month}</span>&nbsp;&nbsp;<span style=" font-size: 1.2rem">${dayName}</span>`
+    },
     time(event: Evento) {
       return `<div class="toastui-calendar-weekday-event" style="--border-color: ${event.color};color: ${ColorUtils.increaseVibrancy(event.dragBackgroundColor, 0.2)}; font-weight: bold; --bg-color: ${ColorUtils.reduceOpacity(ColorUtils.darkenColor(event.backgroundColor, 0.3), 0.2)}; border-radius: 4px; padding: 2px;"><div class="toastui-calendar-weekday-event-title">
       ${formatTime(new Date(event.start))} : ${event.title.toUpperCase()}
@@ -157,12 +157,12 @@ export function useCalendarOptions() {
         },
         weekend: { backgroundColor: 'inherit' },
         timeGridLeft: {
-          width: '100px',
-          backgroundColor: colors['th-grey-50'],
+          width: '70px',
+          backgroundColor: colors['on-surface-variant'],
           borderRight: `1px solid ${colors.border}`,
         },
         timeGridLeftAdditionalTimezone: {
-          backgroundColor: colors['th-grey-100'],
+          backgroundColor: "colors['th-grey-100']",
         },
         timeGridHourLine: {
           borderBottom: `1px solid ${colors['th-grey-200']}`,

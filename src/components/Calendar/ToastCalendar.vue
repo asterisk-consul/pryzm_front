@@ -1,7 +1,13 @@
 <template>
-  <div class="calendar-container">
+  <div class="calendar-container" :style="{ marginTop: '30px' }">
+    <v-btn
+      icon="mdi-cog-outline"
+      @click="dialog.config = !dialog.config"
+      :style="styleBtnConfig"
+    ></v-btn>
     <v-row class="controls-row" :style="rowStylesArriba">
       <!-- Contenido de la fila de controles -->
+
       <v-col
         cols="2"
         class="d-flex align-center justify-center"
@@ -38,6 +44,7 @@
               '--border-color': theme.global.current.value.colors.border,
               '--background-list': theme.global.current.value.colors['background-list'],
               '--on-background': theme.global.current.value.colors.warning,
+              '--height-header': calendarHeight,
             }"
             :view="currentView"
             :calendars="calendars"
@@ -79,12 +86,13 @@
     confirm-text="Confirmar"
     @cerrar="cerrarDialog('eliminar')"
   />
+  <DialogConfig :dialog="dialog.config" @cerrar="cerrarDialog('config')" />
 </template>
 
 <script lang="ts" setup>
 // IMPORTS
 import { storeToRefs } from 'pinia'
-import { ref, onMounted, computed, watch } from 'vue'
+import { ref, onMounted, computed, watch, CSSProperties } from 'vue'
 
 // CALENDARIO
 import TuiCalendar from 'toast-ui-calendar-vue3'
@@ -102,6 +110,7 @@ import DialogCrearEditar from './DialogCrearEditar.vue'
 import CalendarToolbar from './CalendarToolbar.vue'
 import DialogEliminar from '@/components/Dialogs/DialogEliminar.vue'
 import AgendaCalendar from './AgendaCalendar.vue'
+import DialogConfig from './DialogConfig.vue'
 
 // Import theme
 import { useTheme } from 'vuetify'
@@ -120,7 +129,7 @@ const pacientesStore = usePacientesStore()
 
 // STORE ACCIONES
 const { currentView, calendarRef, calendarInstance } = storeToRefs(calendarStore)
-const { prev, next, setToCurrentDate, handleViewChange } = calendarStore
+const { prev, next, setToCurrentDate, handleViewChange, calendarHeight } = calendarStore
 
 const { consultorios } = storeToRefs(consultorioStore)
 const { consultoriosDisponibles, calendars, formattedEvents, consultorioFiltro } =
@@ -138,6 +147,7 @@ const { timezoneOptions, monthOptions, weekOptions, myTheme, calendarTemplate } 
 const dialog = ref({
   editar: false,
   eliminar: false,
+  config: false,
 })
 const isEdit = ref(false)
 const turnoActivo = ref<Turno>({
@@ -190,9 +200,9 @@ const abrirDialogEliminar = (turno: Turno) => {
   turnoActivo.value = turno
   dialog.value.eliminar = true
 }
-const cerrarDialog = (tipo?: 'editar' | 'eliminar') => {
+const cerrarDialog = (tipo?: 'editar' | 'eliminar' | 'config') => {
   if (!tipo) {
-    dialog.value = { editar: false, eliminar: false }
+    dialog.value = { editar: false, eliminar: false, config: false }
     return
   }
   dialog.value[tipo] = false
@@ -373,7 +383,33 @@ const rowStylesArriba = computed(() => ({
   margin: '0 auto',
 }))
 
+const styleBtnConfig = computed(
+  () =>
+    ({
+      right: dialog.value.config ? '335px' : '-15px',
+      top: '-30px',
+      width: '45px',
+      height: '45px',
+      position: 'absolute' as CSSProperties['position'], // esta línea es clave
+      zIndex: '9999',
+      color: theme.global.current.value.colors['on-background'],
+      background: theme.global.current.value.colors.primary,
+      borderRadius: '50% 0 0 50%',
+      transition: 'right 0.2s ease',
+    }) as CSSProperties,
+)
+
 const mostrarCalendario = ref(false)
+watch(
+  () => calendarStore.calendarHeight,
+  (val) => {
+    const el = document.querySelector('.tui-calendar-basic') as HTMLElement
+    if (el) {
+      el.style.setProperty('--height-header', val)
+    }
+  },
+  { immediate: true },
+)
 
 watch(myTheme, (nuevoTema) => {
   if (calendarInstance.value) {
@@ -386,6 +422,7 @@ onMounted(async () => {
   await consultorioStore.cargarDatos()
   await eventsStore.fetchTurnos()
   await pacientesStore.fetchPacientes()
+  calendarStore.updateHoras()
   const editableTheme = JSON.parse(JSON.stringify(myTheme.value))
   calendarInstance.value.setTheme(editableTheme)
   // console.log('consultorioFiltro', eventsStore.fetchTurnos())
@@ -397,6 +434,7 @@ onMounted(async () => {
 .calendar-container {
   width: 93vw;
   margin: 0 auto; /* Centra el contenedor */
+  position: relative;
 }
 
 .controls-row {
@@ -414,16 +452,15 @@ onMounted(async () => {
 }
 
 .tui-calendar-basic.month {
-  position: relative;
   height: 150vh;
 }
 
 .tui-calendar-basic.week {
-  height: 300vh;
+  height: var(--height-header) !important;
 }
 
 .tui-calendar-basic.day {
-  height: 300vh;
+  height: var(--height-header) !important;
 }
 .fade-enter-active,
 .fade-leave-active {
@@ -478,7 +515,12 @@ onMounted(async () => {
     }
   }
 }
-
+.toastui-calendar-timegrid-time-column
+  .toastui-calendar-timegrid-time
+  .toastui-calendar-timegrid-time-label,
+.toastui-calendar-timegrid-time-column .toastui-calendar-timegrid-time span {
+  font-size: 1.2rem;
+}
 .toastui-calendar-daygrid-cell + .toastui-calendar-daygrid-cell {
   border-left: var(--border-color) 0.1px solid !important;
 }
@@ -493,6 +535,17 @@ onMounted(async () => {
   border: 1px solid var(--on-background) !important;
   background-color: var(--background-list) !important;
   color: var(--on-background) !important;
+}
+.toastui-calendar-panel.toastui-calendar-week-view-day-names {
+  .toastui-calendar-day-name-container {
+    margin-left: 70px !important;
+  }
+}
+
+.toastui-calendar-layout.toastui-calendar-day-view {
+  .toastui-calendar-day-name-container {
+    margin-left: 70px !important;
+  }
 }
 
 .toastui-calendar-weekday-event {
