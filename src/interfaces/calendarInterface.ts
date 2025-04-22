@@ -54,7 +54,8 @@ export interface CalendarInstance {
   changeView: (view: ViewType) => void
   getDate: () => Date
   setDate: (date: Date) => void
-  setOptions: (options: Calendar, silent?: boolean) => void
+  setOptions: (options: any, silent?: boolean) => void
+  setTheme: (theme: string) => void
   // ... otros métodos que uses
 }
 export type CalendarView = 'month' | 'week' | 'day' | 'list'
