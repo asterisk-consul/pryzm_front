@@ -420,12 +420,22 @@ watch(myTheme, (nuevoTema) => {
 // Hooks
 onMounted(async () => {
   await consultorioStore.cargarDatos()
+
+  // Primero seteá la fecha actual para que currentMonth y currentYear estén listos
+  calendarStore.setToCurrentDate()
+
+  // Después esperá los turnos
   await eventsStore.fetchTurnos()
+
+  // Luego sincronizá el estado del calendario con los eventos cargados
+  calendarStore.syncCalendarState()
+
   await pacientesStore.fetchPacientes()
   calendarStore.updateHoras()
+
   const editableTheme = JSON.parse(JSON.stringify(myTheme.value))
   calendarInstance.value.setTheme(editableTheme)
-  // console.log('consultorioFiltro', eventsStore.fetchTurnos())
+
   mostrarCalendario.value = true
 })
 </script>
@@ -475,7 +485,7 @@ onMounted(async () => {
 <style>
 .toastui-calendar-see-more-container {
   position: fixed !important; /* o absolute si depende de un contenedor */
-  top: 50% !important;
+  top: 30% !important;
   left: 50% !important;
   transform: translate(-50%, -50%) !important;
   z-index: 9999;

@@ -108,7 +108,14 @@ export const useCalendarStore = defineStore('calendar', () => {
   }
 
   function setToCurrentDate() {
-    calendarInstance.value?.today()
+    const calendar = calendarInstance.value
+
+    if (currentView.value === 'month') {
+      const now = new Date()
+      calendar.setDate(new Date(now.getFullYear(), now.getMonth(), 1)) // Primer día del mes
+    } else {
+      calendar?.today()
+    }
 
     updateCurrentDate()
   }
@@ -138,23 +145,24 @@ export const useCalendarStore = defineStore('calendar', () => {
     localStorage.setItem('calendar_current_date', currentDate.value.toISOString())
   }
 
-  function setCurrentDate(date: Date) {
-    // Si estamos en vista mensual, ajustar al primer día del mes
-    if (currentView.value === 'month') {
-      date = new Date(date.getFullYear(), date.getMonth(), 1)
-    }
+  // function setCurrentDate(date: Date) {
+  //   // Si estamos en vista mensual, ajustar al primer día del mes
+  //   if (currentView.value === 'month') {
+  //     date = new Date(date.getFullYear(), date.getMonth(), 1)
+  //   }
 
-    currentDate.value = date
+  //   currentDate.value = date
 
-    if (currentView.value !== 'list' && calendarInstance.value) {
-      calendarInstance.value.setDate(date)
-    }
-  }
+  //   if (currentView.value !== 'list' && calendarInstance.value) {
+  //     calendarInstance.value.setDate(date)
+  //   }
+  // }
   function handleViewChange(view: ViewType) {
     currentView.value = view
     calendarInstance.value?.changeView(view)
     if (view !== 'list') {
       setToCurrentDate()
+      syncCalendarState()
     }
   }
 
@@ -180,7 +188,7 @@ export const useCalendarStore = defineStore('calendar', () => {
     handleViewChange,
     syncCalendarState,
     navigate,
-    setCurrentDate,
+    // setCurrentDate,
     updateHoras,
     setCalendarHeight,
     calendarHeight,
