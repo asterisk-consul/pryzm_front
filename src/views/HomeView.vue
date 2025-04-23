@@ -19,6 +19,10 @@
       <AnalyticsTotalEarning />
     </VCol>
 
+    <VCol cols="12">
+      <AnalyticsUserTable />
+    </VCol>
+
 
   </VRow>
 </template>
@@ -28,6 +32,7 @@
 import AnalyticsAward from '@/components/dashboard/AnalyticsAward.vue'
 import AnalyticsTransactions from '@/components/dashboard/AnalyticsTransactions.vue'
 import AnalyticsTotalEarning from '@/components/dashboard/AnalyticsTotalEarning.vue'
+import AnalyticsUserTable from '@/components/dashboard/AnalyticsUserTable.vue'
 
 
 </script>

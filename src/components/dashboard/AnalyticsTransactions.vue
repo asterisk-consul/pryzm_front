@@ -2,7 +2,7 @@
   <VCard title="Turnos">
     <template #subtitle>
       <p class="text-body-1 mb-0">
-        <span class="d-inline-block font-weight-medium text-high-emphasis">Resumen general de turnos</span> <span class="text-high-emphasis">📋</span>
+        <span class="d-inline-block font-weight-medium text-high-emphasis">Resumen general de turnos del mes </span> <span class="text-high-emphasis">📋</span>
       </p>
     </template>
 
@@ -19,7 +19,7 @@
           sm="6"
           md="3"
         >
-          <div class="d-flex align-center gap-x-3">
+          <div class="d-flex align-center custom-gap">
             <VAvatar
               :color="item.color"
               rounded
@@ -46,43 +46,46 @@
     </VCardText>
   </VCard>
 </template>
+<style>
+.custom-gap {
+  column-gap: 20px !important; /* fuerza separación horizontal */
+}
+</style>
 
 <script setup lang="ts">
-import { ref, onMounted, computed } from 'vue'
-import type { Turno } from '@/interfaces/turnosInterface'
-import { useServiceTurnos } from '@/services/turnosServices'
+import { onMounted, computed } from 'vue'
+import { useCalendarEventsStore } from '@/stores/calendarEventsStore'
 
-const turnos = ref<Turno[]>([])
-const { cargarTurnos } = useServiceTurnos(turnos)
+const store = useCalendarEventsStore()
 
 onMounted(async () => {
   try {
-    await cargarTurnos()
+    await store.fetchTurnos()
   } catch (error) {
     console.error('Error cargando turnos:', error)
   }
 })
 
-// Computed stats
-const totalTurnos = computed(() => turnos.value.length)
+const totalTurnos = computed(() => store.turnos.length)
+const turnosDelMesActual = computed(() => store.eventsForMonth.length)
 
 const turnosPendientes = computed(() =>
-  turnos.value.filter(t => estado.toLowerCase() === 'pendiente').length
+  store.turnos.filter(t => t.estado?.toLowerCase() === 'pendiente').length
 )
 
 const turnosAprobados = computed(() =>
-  turnos.value.filter(t => t.estado.toLowerCase() === 'aprobado').length
+  store.turnos.filter(t => t.estado?.toLowerCase() === 'aprobado').length
 )
 
 const turnosFinalizados = computed(() =>
-  turnos.value.filter(t => estado.toLowerCase() === 'finalizado').length
+  store.turnos.filter(t => t.estado?.toLowerCase() === 'finalizado').length
 )
 
 const statistics = computed(() => [
   {
     title: 'Total de turnos',
-    stats: totalTurnos.value,
-    icon: 'ri-calendar-check-line',
+    stats: turnosDelMesActual.value,
+    icon: 'ri-pie-chart-2-line',
     color: 'primary',
   },
   {
@@ -110,4 +113,6 @@ const moreList = [
   { title: 'Actualizar', value: 'Refresh' },
   { title: 'Editar', value: 'Update' },
 ]
+
+
 </script>

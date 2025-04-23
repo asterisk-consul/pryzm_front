@@ -210,9 +210,33 @@ export const useCalendarEventsStore = defineStore('calendarEvents', () => {
     const index = consultoriosDisponibles.value.indexOf(consultorio) % colors.length
     return colors[index]
   }
+  // dashboard 
+  const turnosDelMesActual = computed(() => {
+    return turnos.value.filter(turno => {
+      if (!turno.fecha) return false
+      const fechaTurno = new Date(turno.fecha)
+      return (
+        fechaTurno.getMonth() === currentMonth.value &&
+        fechaTurno.getFullYear() === currentYear.value
+      )
+    })
+  })
+
+  const totalTurnos = computed(() => turnosDelMesActual.value.length)
+
+const turnosPorEstado = computed(() => {
+  return turnosDelMesActual.value.reduce((acc: Record<string, number>, turno) => {
+    const estado = turno.estado || 'sin estado'
+    acc[estado] = (acc[estado] || 0) + 1
+    return acc
+  }, {})
+})
 
   return {
     // Estado
+    totalTurnos,
+    turnosDelMesActual,
+    turnosPorEstado,
     turnos,
     consultorioFiltro,
     isLoading,

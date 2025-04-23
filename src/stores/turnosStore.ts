@@ -1,13 +1,24 @@
-import { defineStore } from 'pinia'
-import { Ref } from 'vue'
 
+// stores/turnosStore.ts
+
+import { defineStore } from 'pinia'
+import { ref } from 'vue'
 import type { Turno } from '@/interfaces/turnosInterface'
 import { useServiceTurnos } from '@/services/turnosServices'
-const { getTurnos } = useServiceTurnos()
 
 export const useTurnosStore = defineStore('turnos', () => {
-  const cagarTurnos = async (turnos: Ref<Turno[]>) => {
-    await getTurnos(turnos)
+  const turnos = ref<Turno[]>([])
+  const { getTurnos } = useServiceTurnos()
+
+  const cargarTurnos = async () => {
+    const data = await getTurnos()
+    turnos.value = data
   }
-  return { cagarTurnos }
+
+  return {
+    turnos,
+    cargarTurnos
+  }
 })
+
+
