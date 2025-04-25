@@ -1,7 +1,13 @@
 <template>
-  <div class="calendar-container">
+  <div class="calendar-container" :style="{ marginTop: '30px' }">
+    <v-btn
+      icon="mdi-cog-outline"
+      @click="dialog.config = !dialog.config"
+      :style="styleBtnConfig"
+    ></v-btn>
     <v-row class="controls-row" :style="rowStylesArriba">
       <!-- Contenido de la fila de controles -->
+
       <v-col
         cols="2"
         class="d-flex align-center justify-center"
@@ -28,30 +34,37 @@
           class="filtro-consultorios"
         />
       </v-col>
-      <v-col cols="10" class="pa-0">
-        <tui-calendar
-          v-show="currentView !== 'list'"
-          ref="calendarRef"
-          class="tui-calendar-basic"
-          :view="currentView"
-          :calendars="calendars"
-          :events="formattedEvents"
-          :month="monthOptions"
-          :theme="myTheme"
-          :template="calendarTemplate"
-          :timezone="timezoneOptions"
-          :week="weekOptions"
-          :use-form-popup="false"
-          :use-detail-popup="false"
-          @selectDateTime="onCreateEvent"
-          @beforeUpdateEvent="onUpdateEvent"
-          @clickEvent="onClickEvent"
-        />
-        <AgendaCalendar
-          v-show="currentView === 'list'"
-          :currentDate="calendarStore.currentDate"
-          @show-event="onClickEvent"
-        />
+      <v-col cols="10" class="pa-0 ma-0" style="max-height: 80vh; overflow: auto">
+        <div v-show="mostrarCalendario" style="min-height: 100%">
+          <tui-calendar
+            v-show="currentView !== 'list'"
+            ref="calendarRef"
+            :class="['tui-calendar-basic', currentView]"
+            :style="{
+              '--border-color': theme.global.current.value.colors.border,
+              '--background-list': theme.global.current.value.colors['background-list'],
+              '--on-background': theme.global.current.value.colors.warning,
+              '--height-header': calendarHeight,
+            }"
+            :view="currentView"
+            :calendars="calendars"
+            :events="formattedEvents"
+            :month="monthOptions"
+            :template="calendarTemplate"
+            :timezone="timezoneOptions"
+            :week="weekOptions"
+            :use-form-popup="false"
+            :use-detail-popup="false"
+            @selectDateTime="onCreateEvent"
+            @beforeUpdateEvent="onUpdateEvent"
+            @clickEvent="onClickEvent"
+          />
+          <AgendaCalendar
+            v-show="currentView === 'list'"
+            :currentDate="calendarStore.currentDate"
+            @show-event="onClickEvent"
+          />
+        </div>
       </v-col>
     </v-row>
   </div>
@@ -73,19 +86,20 @@
     confirm-text="Confirmar"
     @cerrar="cerrarDialog('eliminar')"
   />
+  <DialogConfig :dialog="dialog.config" @cerrar="cerrarDialog('config')" />
 </template>
 
 <script lang="ts" setup>
 // IMPORTS
 import { storeToRefs } from 'pinia'
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch, CSSProperties } from 'vue'
 
 // CALENDARIO
 import TuiCalendar from 'toast-ui-calendar-vue3'
 import 'toast-ui-calendar-vue3/styles.css'
 
 // import { formatDate, formatTime } from '@/utils/formatDateTime'
-import type { Turno, Evento } from '@/interfaces'
+import type { Turno } from '@/interfaces'
 import { useCalendarOptions } from './CaledendarConfig/calendarOptions'
 
 // COMPONENTS
@@ -96,6 +110,7 @@ import DialogCrearEditar from './DialogCrearEditar.vue'
 import CalendarToolbar from './CalendarToolbar.vue'
 import DialogEliminar from '@/components/Dialogs/DialogEliminar.vue'
 import AgendaCalendar from './AgendaCalendar.vue'
+import DialogConfig from './DialogConfig.vue'
 
 // Import theme
 import { useTheme } from 'vuetify'
@@ -105,6 +120,7 @@ import { useCalendarStore } from '@/stores/calendarStore'
 import { useCalendarEventsStore } from '@/stores/calendarEventsStore'
 import { useConsultoriosStore } from '@/stores/consultoriosStores'
 import { usePacientesStore } from '@/stores/pacientesStores'
+import { createEventHandlers } from './CaledendarConfig/calendarEventHanlers'
 
 const calendarStore = useCalendarStore()
 const eventsStore = useCalendarEventsStore()
@@ -112,8 +128,8 @@ const consultorioStore = useConsultoriosStore()
 const pacientesStore = usePacientesStore()
 
 // STORE ACCIONES
-const { currentView, calendarRef } = storeToRefs(calendarStore)
-const { prev, next, setToCurrentDate, handleViewChange } = calendarStore
+const { currentView, calendarRef, calendarInstance } = storeToRefs(calendarStore)
+const { prev, next, setToCurrentDate, handleViewChange, calendarHeight } = calendarStore
 
 const { consultorios } = storeToRefs(consultorioStore)
 const { consultoriosDisponibles, calendars, formattedEvents, consultorioFiltro } =
@@ -131,6 +147,7 @@ const { timezoneOptions, monthOptions, weekOptions, myTheme, calendarTemplate } 
 const dialog = ref({
   editar: false,
   eliminar: false,
+  config: false,
 })
 const isEdit = ref(false)
 const turnoActivo = ref<Turno>({
@@ -179,169 +196,172 @@ const abrirDialogCrear = () => {
   dialog.value.editar = true
   isEdit.value = false
 }
-
 const abrirDialogEliminar = (turno: Turno) => {
   turnoActivo.value = turno
   dialog.value.eliminar = true
 }
-
-const cerrarDialog = (tipo?: 'editar' | 'eliminar') => {
+const cerrarDialog = (tipo?: 'editar' | 'eliminar' | 'config') => {
   if (!tipo) {
-    dialog.value = { editar: false, eliminar: false }
+    dialog.value = { editar: false, eliminar: false, config: false }
     return
   }
   dialog.value[tipo] = false
 }
+const { onClickEvent, onCreateEvent, onUpdateEvent } = createEventHandlers(
+  turnoActivo,
+  isEdit,
+  dialog,
+)
 
-const onClickEvent = (clickedEvent: Evento) => {
-  // ✅ Si viene envuelto en { event: {...} }, usá ese
-  const realEvent = clickedEvent.event || clickedEvent
+// const onClickEvent = (clickedEvent: Evento) => {
+//   // ✅ Si viene envuelto en { event: {...} }, usá ese
+//   const realEvent = clickedEvent.event || clickedEvent
 
-  const fullEvent = formattedEvents.value.find((e) => e.id === realEvent.id)
+//   const fullEvent = formattedEvents.value.find((e) => e.id === realEvent.id)
 
-  if (!fullEvent) {
-    console.error('Evento no encontrado en formattedEvents', realEvent)
-    return
-  }
+//   if (!fullEvent) {
+//     console.error('Evento no encontrado en formattedEvents', realEvent)
+//     return
+//   }
 
-  const raw = fullEvent.raw as {
-    id_paciente: number | null
-    id_consultorio: number | null
-    id_tratamiento: number | null
-    estado: string
-    nombre_paciente: string
-    apellido_paciente: string
-    costo_tratamiento: number | null
-  }
+//   const raw = fullEvent.raw as {
+//     id_paciente: number | null
+//     id_consultorio: number | null
+//     id_tratamiento: number | null
+//     estado: string
+//     nombre_paciente: string
+//     apellido_paciente: string
+//     costo_tratamiento: number | null
+//   }
 
-  const startDate = fullEvent.start instanceof Date ? fullEvent.start : new Date(fullEvent.start)
-  const endDate = fullEvent.end instanceof Date ? fullEvent.end : new Date(fullEvent.end)
+//   const startDate = fullEvent.start instanceof Date ? fullEvent.start : new Date(fullEvent.start)
+//   const endDate = fullEvent.end instanceof Date ? fullEvent.end : new Date(fullEvent.end)
 
-  const durationMinutes =
-    endDate && startDate ? (endDate.getTime() - startDate.getTime()) / 60000 : 0
+//   const durationMinutes =
+//     endDate && startDate ? (endDate.getTime() - startDate.getTime()) / 60000 : 0
 
-  const formatDate = (date: Date) => date.toISOString().split('T')[0]
-  const formatTime = (date: Date) => date.toTimeString().slice(0, 5)
+//   const formatDate = (date: Date) => date.toISOString().split('T')[0]
+//   const formatTime = (date: Date) => date.toTimeString().slice(0, 5)
 
-  turnoActivo.value = {
-    id_turno: parseInt(fullEvent.id),
-    id_paciente: raw.id_paciente,
-    id_consultorio: raw.id_consultorio,
-    id_tratamiento: raw.id_tratamiento,
-    fecha: formatDate(startDate),
-    hora: formatTime(startDate),
-    nombre_tratamiento: fullEvent.body,
-    color_tratamiento: fullEvent.backgroundColor,
-    duracion_tratamiento: durationMinutes,
-    nombre_consultorio: calendars.value.find((c) => c.id === fullEvent.calendarId)?.name || '',
-    estado: raw.estado,
-    nombre_paciente: raw.nombre_paciente,
-    apellido_paciente: raw.apellido_paciente,
-    costo_tratamiento: raw.costo_tratamiento,
-  }
+//   turnoActivo.value = {
+//     id_turno: parseInt(fullEvent.id),
+//     id_paciente: raw.id_paciente,
+//     id_consultorio: raw.id_consultorio,
+//     id_tratamiento: raw.id_tratamiento,
+//     fecha: formatDate(startDate),
+//     hora: formatTime(startDate),
+//     nombre_tratamiento: fullEvent.body,
+//     color_tratamiento: fullEvent.backgroundColor,
+//     duracion_tratamiento: durationMinutes,
+//     nombre_consultorio: calendars.value.find((c) => c.id === fullEvent.calendarId)?.name || '',
+//     estado: raw.estado,
+//     nombre_paciente: raw.nombre_paciente,
+//     apellido_paciente: raw.apellido_paciente,
+//     costo_tratamiento: raw.costo_tratamiento,
+//   }
 
-  // console.log('Turno activo:', turnoActivo.value)
+//   // console.log('Turno activo:', turnoActivo.value)
 
-  isEdit.value = true
-  dialog.value.editar = true
-}
+//   isEdit.value = true
+//   dialog.value.editar = true
+// }
 
-const onCreateEvent = (eventData: Evento) => {
-  console.log('Evento creado:', eventData) // Verifica que se imprima el evento
+// const onCreateEvent = (eventData: Evento) => {
+//   console.log('Evento creado:', eventData) // Verifica que se imprima el evento
 
-  if (!eventData) {
-    console.error('No se recibió eventData')
-    return
-  }
+//   if (!eventData) {
+//     console.error('No se recibió eventData')
+//     return
+//   }
 
-  const { start, calendarId, id_consultorio } = eventData
-  const dateStart = start instanceof Date ? start : new Date(start)
-  const fecha = dateStart.toISOString().split('T')[0]
-  const hora = dateStart.toTimeString().slice(0, 5)
+//   const { start, calendarId, id_consultorio } = eventData
+//   const dateStart = start instanceof Date ? start : new Date(start)
+//   const fecha = dateStart.toISOString().split('T')[0]
+//   const hora = dateStart.toTimeString().slice(0, 5)
 
-  console.log('fecha', fecha)
-  const consultorio = calendars.value.find((c) => c.id === calendarId)?.name
+//   console.log('fecha', fecha)
+//   const consultorio = calendars.value.find((c) => c.id === calendarId)?.name
 
-  turnoActivo.value = {
-    fecha: fecha,
-    hora: hora,
-    id_consultorio,
-    estado: 'pendiente',
-    id_paciente: null,
-    id_tratamiento: null,
-    nombre_consultorio: consultorio,
-    nombre_tratamiento: '',
-    duracion_tratamiento: null,
-    nombre_paciente: '',
-    apellido_paciente: '',
-    costo_tratamiento: null,
-    color_tratamiento: '',
-    id_turno: null,
-  }
+//   turnoActivo.value = {
+//     fecha: fecha,
+//     hora: hora,
+//     id_consultorio,
+//     estado: 'pendiente',
+//     id_paciente: null,
+//     id_tratamiento: null,
+//     nombre_consultorio: consultorio,
+//     nombre_tratamiento: '',
+//     duracion_tratamiento: null,
+//     nombre_paciente: '',
+//     apellido_paciente: '',
+//     costo_tratamiento: null,
+//     color_tratamiento: '',
+//     id_turno: null,
+//   }
 
-  dialog.value.editar = true
-  isEdit.value = true
-}
+//   dialog.value.editar = true
+//   isEdit.value = true
+// }
 
-const onUpdateEvent = async (updateData: { event: Evento; changes: Partial<Evento> }) => {
-  const { event, changes } = updateData
+// const onUpdateEvent = async (updateData: { event: Evento; changes: Partial<Evento> }) => {
+//   const { event, changes } = updateData
 
-  try {
-    const originalEvent = formattedEvents.value.find((e) => e.id === event.id)
-    if (!originalEvent) {
-      console.error('Event not found for update:', event)
-      return
-    }
+//   try {
+//     const originalEvent = formattedEvents.value.find((e) => e.id === event.id)
+//     if (!originalEvent) {
+//       console.error('Event not found for update:', event)
+//       return
+//     }
 
-    const updatedEvent = {
-      ...originalEvent,
-      ...changes,
-    }
+//     const updatedEvent = {
+//       ...originalEvent,
+//       ...changes,
+//     }
 
-    if (!updatedEvent.raw) {
-      updatedEvent.raw = originalEvent.raw || {}
-    }
+//     if (!updatedEvent.raw) {
+//       updatedEvent.raw = originalEvent.raw || {}
+//     }
 
-    // Cast raw
+//     // Cast raw
 
-    const raw = updatedEvent.raw as {
-      id_paciente: number | null
-      id_consultorio: number | null
-      id_tratamiento: number | null
-      estado: string
-      nombre_paciente: string
-      apellido_paciente: string
-      costo_tratamiento: number | null
-    }
+//     const raw = updatedEvent.raw as {
+//       id_paciente: number | null
+//       id_consultorio: number | null
+//       id_tratamiento: number | null
+//       estado: string
+//       nombre_paciente: string
+//       apellido_paciente: string
+//       costo_tratamiento: number | null
+//     }
 
-    const startDate = new Date(updatedEvent.start as string | Date)
-    const endDate = new Date(updatedEvent.end as string | Date)
+//     const startDate = new Date(updatedEvent.start as string | Date)
+//     const endDate = new Date(updatedEvent.end as string | Date)
 
-    const durationMinutes = (endDate.getTime() - startDate.getTime()) / 60000
+//     const durationMinutes = (endDate.getTime() - startDate.getTime()) / 60000
 
-    const turnoToUpdate: Turno = {
-      id_turno: parseInt(updatedEvent.id),
-      id_paciente: raw.id_paciente,
-      id_consultorio: raw.id_consultorio,
-      id_tratamiento: raw.id_tratamiento,
-      fecha: startDate.toISOString().split('T')[0],
-      hora: startDate.toTimeString().slice(0, 5),
-      nombre_tratamiento: updatedEvent.body,
-      color_tratamiento: updatedEvent.backgroundColor,
-      duracion_tratamiento: durationMinutes,
-      nombre_consultorio: calendars.value.find((c) => c.id === updatedEvent.calendarId)?.name || '',
-      estado: raw.estado || 'pendiente',
-      nombre_paciente: raw.nombre_paciente || '',
-      apellido_paciente: raw.apellido_paciente || '',
-      costo_tratamiento: raw.costo_tratamiento || null,
-    }
+//     const turnoToUpdate: Turno = {
+//       id_turno: parseInt(updatedEvent.id),
+//       id_paciente: raw.id_paciente,
+//       id_consultorio: raw.id_consultorio,
+//       id_tratamiento: raw.id_tratamiento,
+//       fecha: startDate.toISOString().split('T')[0],
+//       hora: startDate.toTimeString().slice(0, 5),
+//       nombre_tratamiento: updatedEvent.body,
+//       color_tratamiento: updatedEvent.backgroundColor,
+//       duracion_tratamiento: durationMinutes,
+//       nombre_consultorio: calendars.value.find((c) => c.id === updatedEvent.calendarId)?.name || '',
+//       estado: raw.estado || 'pendiente',
+//       nombre_paciente: raw.nombre_paciente || '',
+//       apellido_paciente: raw.apellido_paciente || '',
+//       costo_tratamiento: raw.costo_tratamiento || null,
+//     }
 
-    await eventsStore.actualizarTurno(turnoToUpdate)
-    await eventsStore.fetchTurnos()
-  } catch (error) {
-    console.error('Error updating event:', error)
-  }
-}
+//     await eventsStore.actualizarTurno(turnoToUpdate)
+//     await eventsStore.fetchTurnos()
+//   } catch (error) {
+//     console.error('Error updating event:', error)
+//   }
+// }
 
 // STYLES CALENDARIO
 
@@ -363,12 +383,60 @@ const rowStylesArriba = computed(() => ({
   margin: '0 auto',
 }))
 
+const styleBtnConfig = computed(
+  () =>
+    ({
+      right: dialog.value.config ? '335px' : '-15px',
+      top: '-30px',
+      width: '45px',
+      height: '45px',
+      position: 'absolute' as CSSProperties['position'], // esta línea es clave
+      zIndex: '9999',
+      color: theme.global.current.value.colors['on-background'],
+      background: theme.global.current.value.colors.primary,
+      borderRadius: '50% 0 0 50%',
+      transition: 'right 0.2s ease',
+    }) as CSSProperties,
+)
+
+const mostrarCalendario = ref(false)
+watch(
+  () => calendarStore.calendarHeight,
+  (val) => {
+    const el = document.querySelector('.tui-calendar-basic') as HTMLElement
+    if (el) {
+      el.style.setProperty('--height-header', val)
+    }
+  },
+  { immediate: true },
+)
+
+watch(myTheme, (nuevoTema) => {
+  if (calendarInstance.value) {
+    const editableTheme = JSON.parse(JSON.stringify(nuevoTema))
+    calendarInstance.value.setTheme(editableTheme)
+  }
+})
 // Hooks
 onMounted(async () => {
   await consultorioStore.cargarDatos()
+
+  // Primero seteá la fecha actual para que currentMonth y currentYear estén listos
+  calendarStore.setToCurrentDate()
+
+  // Después esperá los turnos
   await eventsStore.fetchTurnos()
+
+  // Luego sincronizá el estado del calendario con los eventos cargados
+  calendarStore.syncCalendarState()
+
   await pacientesStore.fetchPacientes()
-  // console.log('consultorioFiltro', eventsStore.fetchTurnos())
+  calendarStore.updateHoras()
+
+  const editableTheme = JSON.parse(JSON.stringify(myTheme.value))
+  calendarInstance.value.setTheme(editableTheme)
+
+  mostrarCalendario.value = true
 })
 </script>
 
@@ -376,6 +444,7 @@ onMounted(async () => {
 .calendar-container {
   width: 93vw;
   margin: 0 auto; /* Centra el contenedor */
+  position: relative;
 }
 
 .controls-row {
@@ -387,9 +456,124 @@ onMounted(async () => {
 }
 
 .tui-calendar-basic {
-  width: 100%;
-  height: 100vh;
+  min-height: 100%;
+  height: auto;
+  box-sizing: border-box;
+}
+
+.tui-calendar-basic.month {
+  height: 150vh;
+}
+
+.tui-calendar-basic.week {
+  height: var(--height-header) !important;
+}
+
+.tui-calendar-basic.day {
+  height: var(--height-header) !important;
+}
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.4s ease;
+}
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>
 
-<style></style>
+<style>
+.toastui-calendar-see-more-container {
+  position: fixed !important; /* o absolute si depende de un contenedor */
+  top: 30% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  z-index: 9999;
+
+  .toastui-calendar-see-more {
+    border-radius: 1rem;
+    padding: 0.5rem 1rem 2.5rem 1rem;
+
+    .toastui-calendar-see-more-header {
+      text-align: center;
+      font-size: 1.5rem;
+    }
+    .toastui-calendar-popup-button.toastui-calendar-popup-close {
+      background-color: transparent !important;
+      top: 0 !important;
+      right: 5px !important;
+      width: 30px !important;
+      height: 30px !important;
+      border-radius: 50% !important;
+
+      .toastui-calendar-template-monthMoreClose {
+        button {
+          font-size: 1.4rem;
+          width: 100%;
+          height: 100%;
+          border: none;
+          border-radius: 50%;
+          background-color: transparent;
+          cursor: pointer;
+          transition: background-color 0.2s ease;
+
+          &:hover {
+            background-color: var(--hover-bg, #222);
+          }
+        }
+      }
+    }
+  }
+}
+.toastui-calendar-timegrid-time-column
+  .toastui-calendar-timegrid-time
+  .toastui-calendar-timegrid-time-label,
+.toastui-calendar-timegrid-time-column .toastui-calendar-timegrid-time span {
+  font-size: 1.2rem;
+}
+.toastui-calendar-daygrid-cell + .toastui-calendar-daygrid-cell {
+  border-left: var(--border-color) 0.1px solid !important;
+}
+.toastui-calendar-month-week-item:last-child {
+  .toastui-calendar-daygrid-cell {
+    border-bottom: var(--border-color) 0.1px solid !important;
+  }
+}
+
+.toastui-calendar-grid-cell-date
+  .toastui-calendar-weekday-grid-date.toastui-calendar-weekday-grid-date-decorator {
+  border: 1px solid var(--on-background) !important;
+  background-color: var(--background-list) !important;
+  color: var(--on-background) !important;
+}
+.toastui-calendar-panel.toastui-calendar-week-view-day-names {
+  .toastui-calendar-day-name-container {
+    margin-left: 70px !important;
+  }
+}
+
+.toastui-calendar-layout.toastui-calendar-day-view {
+  .toastui-calendar-day-name-container {
+    margin-left: 70px !important;
+  }
+}
+
+.toastui-calendar-weekday-event {
+  .toastui-calendar-weekday-event {
+    border-radius: 0.8rem 0.8rem 0.8rem 0.8rem !important;
+    background-color: var(--bg-color) !important;
+    font-size: 0.75rem;
+    line-height: 1rem;
+    padding: 0;
+    div {
+      padding: 2px 4px !important;
+    }
+  }
+  .toastui-calendar-weekday-event-dot {
+    display: none;
+  }
+  .toastui-calendar-weekday-resize-handle.toastui-calendar-handle-y {
+    display: none;
+  }
+}
+</style>

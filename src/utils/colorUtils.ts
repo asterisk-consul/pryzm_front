@@ -103,6 +103,118 @@ export const lightenColor = (hex: string, factor: number = 0.2): string => {
   return rgbToHex(lighterR, lighterG, lighterB)
 }
 
+/**
+ * Reduce la opacidad de un color
+ * @param {string} color - Color en formato hexadecimal (#RRGGBB) o RGB (rgb(255, 255, 255))
+ * @param {number} opacity - Opacidad deseada (0 a 1)
+ * @returns {string} - Color con opacidad reducida en formato rgba
+ */
+export const reduceOpacity = (color: string, opacity: number): string => {
+  // Validar que la opacidad esté entre 0 y 1
+  if (opacity < 0 || opacity > 1) {
+    throw new Error('La opacidad debe estar entre 0 y 1')
+  }
+
+  // Manejar colores hexadecimales
+  if (color.startsWith('#')) {
+    if (!isValidHexColor(color)) {
+      throw new Error(`Invalid hex color: ${color}`)
+    }
+
+    const { r, g, b } = hexToRgb(color)
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`
+  }
+
+  // Manejar colores RGB
+  if (color.startsWith('rgb(')) {
+    const rgbValues = color.replace('rgb(', '').replace(')', '').split(',')
+    const r = parseInt(rgbValues[0].trim())
+    const g = parseInt(rgbValues[1].trim())
+    const b = parseInt(rgbValues[2].trim())
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`
+  }
+
+  // Manejar colores RGBA (reemplazar la opacidad existente)
+  if (color.startsWith('rgba(')) {
+    const rgbaValues = color.replace('rgba(', '').replace(')', '').split(',')
+    const r = parseInt(rgbaValues[0].trim())
+    const g = parseInt(rgbaValues[1].trim())
+    const b = parseInt(rgbaValues[2].trim())
+
+    return `rgba(${r}, ${g}, ${b}, ${opacity})`
+  }
+
+  throw new Error('Formato de color no soportado. Use #RRGGBB, rgb(R, G, B) o rgba(R, G, B, A)')
+}
+
+/**
+ * Aumenta la vibración de un color haciéndolo más intenso
+ * @param color - Color en formato hexadecimal (#RRGGBB) o RGB (rgb(255, 255, 255))
+ * @param factor - Factor de intensificación (0 a 1)
+ * @returns Color más vibrante en el mismo formato de entrada
+ */
+export const increaseVibrancy = (color: string, factor: number = 0.3): string => {
+  // Validar que el factor esté entre 0 y 1
+  if (factor < 0 || factor > 1) {
+    throw new Error('El factor debe estar entre 0 y 1')
+  }
+
+  // Función para ajustar el componente de color
+  const boostComponent = (value: number) => {
+    if (value < 128) {
+      return Math.floor(value * (1 - factor)) // Oscurecer los componentes oscuros
+    } else {
+      return Math.min(255, Math.floor(value * (1 + factor))) // Aclarar los componentes claros
+    }
+  }
+
+  // Manejar colores hexadecimales
+  if (color.startsWith('#')) {
+    if (!isValidHexColor(color)) {
+      throw new Error(`Invalid hex color: ${color}`)
+    }
+
+    const { r, g, b } = hexToRgb(color)
+    const boostedR = boostComponent(r)
+    const boostedG = boostComponent(g)
+    const boostedB = boostComponent(b)
+
+    return rgbToHex(boostedR, boostedG, boostedB)
+  }
+
+  // Manejar colores RGB
+  if (color.startsWith('rgb(')) {
+    const rgbValues = color.replace('rgb(', '').replace(')', '').split(',')
+    const r = parseInt(rgbValues[0].trim())
+    const g = parseInt(rgbValues[1].trim())
+    const b = parseInt(rgbValues[2].trim())
+
+    const boostedR = boostComponent(r)
+    const boostedG = boostComponent(g)
+    const boostedB = boostComponent(b)
+
+    return `rgb(${boostedR}, ${boostedG}, ${boostedB})`
+  }
+
+  // Manejar colores RGBA (mantener la opacidad)
+  if (color.startsWith('rgba(')) {
+    const rgbaValues = color.replace('rgba(', '').replace(')', '').split(',')
+    const r = parseInt(rgbaValues[0].trim())
+    const g = parseInt(rgbaValues[1].trim())
+    const b = parseInt(rgbaValues[2].trim())
+    const a = parseFloat(rgbaValues[3].trim())
+
+    const boostedR = boostComponent(r)
+    const boostedG = boostComponent(g)
+    const boostedB = boostComponent(b)
+
+    return `rgba(${boostedR}, ${boostedG}, ${boostedB}, ${a})`
+  }
+
+  throw new Error('Formato de color no soportado. Use #RRGGBB, rgb(R, G, B) o rgba(R, G, B, A)')
+}
+
 // Opcional: Exportar todas las funciones como objeto
 export const ColorUtils = {
   isValidHexColor,
@@ -110,6 +222,8 @@ export const ColorUtils = {
   rgbToHex,
   darkenColor,
   lightenColor,
+  reduceOpacity,
+  increaseVibrancy,
 }
 
 /**

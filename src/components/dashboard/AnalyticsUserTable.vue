@@ -1,8 +1,10 @@
 <template>
     <VCard>
       <VDataTable
+      
         :headers="headers"
         :items="userData"
+        :loading="store.turnos.length === 0"
         item-value="id"
         class="text-no-wrap"
       >
@@ -18,7 +20,7 @@
         <!-- Celda personalizada para Estado -->
         <template #item.estado="{ item }">
           <VChip
-            :color="item.estado === 'completado' ? 'success' : item.estado === 'pendiente' ? 'warning' : 'default'"
+            :color="item.estado === 'finalizado' ? 'success' : item.estado === 'pendiente' ? 'warning' : 'default'"
             size="small"
             class="text-capitalize"
           >
@@ -48,35 +50,30 @@
   </template>
   
   <script lang="ts" setup>
-  import { ref, onMounted, computed } from 'vue'
-  import { useTurnosStore } from '@/stores/turnosStore'
-  import type { Turno } from '@/interfaces/turnosInterface'
-  
-  const store = useTurnosStore()
-  const turnos = ref<Turno[]>([])
-    
-  
-  onMounted(async () => {
-    await store.cargarTurnos(turnos)
-    console.log('Turnos cargados:', JSON.stringify(turnos.value, null, 2))
-    
-  })
-  
-  const userData = computed(() =>
-    turnos.value.map(t => ({
-      id: `${t.id_turno}`,
-      paciente: t.nombre_paciente,
-      tratamiento: t.nombre_tratamiento,
-      estado: t.estado,
-      costo: t.costo_tratamiento
-    }))                                       
-  )
-  
-  const headers = [
-    { title: 'Paciente', key: 'paciente' },
-    { title: 'Tratamiento', key: 'tratamiento' },
-    { title: 'Estado', key: 'estado' },
-    { title: 'Costo', key: 'costo' }
-  ]
-  </script>
-  
+import { onMounted, computed } from 'vue'
+import { useTurnosStore } from '@/stores/turnosStore'
+
+const store = useTurnosStore()
+
+onMounted(async () => {
+  await store.cargarTurnos()
+
+  console.log('Transformados:', store.value)
+})
+
+const userData = computed(() =>
+  store.turnos.map(t => ({
+    paciente: t.nombre_paciente,
+    tratamiento: t.nombre_tratamiento,
+    estado: t.estado,
+    costo: t.costo_tratamiento
+  }))
+)
+
+const headers = [
+  { title: 'Paciente', key: 'paciente' },
+  { title: 'Tratamiento', key: 'tratamiento' },
+  { title: 'Estado', key: 'estado' },
+  { title: 'Costo', key: 'costo' }
+]
+</script>

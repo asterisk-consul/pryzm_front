@@ -199,8 +199,9 @@ const { modelValue, isEdit, consultorios } = toRefs(props)
 const emit = defineEmits(['update:modelValue', 'create-turno', 'deleteTurno'])
 
 const cerrarMenuFecha = () => {
-  this.$refs.menuFecha.save(this.nuevoTurno.fecha) // cierra el menú
+  menuFecha.value = false // Simplemente cambia el estado a false
 }
+
 const cerrarDialog = () => {
   emit('update:modelValue', false)
   resetForm()

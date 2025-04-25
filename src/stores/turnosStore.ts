@@ -1,6 +1,3 @@
-
-// stores/turnosStore.ts
-
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import type { Turno } from '@/interfaces/turnosInterface'
@@ -11,8 +8,12 @@ export const useTurnosStore = defineStore('turnos', () => {
   const { getTurnos } = useServiceTurnos()
 
   const cargarTurnos = async () => {
-    const data = await getTurnos()
-    turnos.value = data
+    try {
+      const data = await getTurnos()
+      turnos.value = data
+    } catch (error) {
+      console.error('Error al cargar turnos:', error)
+    }
   }
 
   return {
@@ -20,5 +21,3 @@ export const useTurnosStore = defineStore('turnos', () => {
     cargarTurnos
   }
 })
-
-

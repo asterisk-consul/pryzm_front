@@ -33,28 +33,15 @@
       {{ view.label }}
     </v-btn>
   </v-btn-toggle>
-
-  <v-dialog
-    v-model="dialog"
-    scrollable
-    :overlay="false"
-    max-width="500px"
-    transition="dialog-transition"
-  >
-    <DialogCrearEditar />
-  </v-dialog>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useCalendarStore } from '@/stores/calendarStore'
 import type { ViewOption, ViewType } from '@/interfaces/calendarInterface'
-import DialogCrearEditar from './DialogCrearEditar.vue'
 import { useTheme } from 'vuetify'
 
 const theme = useTheme()
 const calendarStore = useCalendarStore()
-const dialog = ref(false)
 
 const viewOptions: ViewOption[] = [
   { value: 'month', label: 'Mes' },
@@ -65,9 +52,9 @@ const viewOptions: ViewOption[] = [
 
 // Cambiar vista
 const handleChange = (newView: ViewType) => {
-  if (calendarStore.currentView !== newView) {
+  if (newView !== 'list') {
     calendarStore.handleViewChange(newView)
-    localStorage.setItem('calendar_view', newView) // guardar en localStorage
+    localStorage.setItem('calendar_view', newView)
   }
 }
 </script>
