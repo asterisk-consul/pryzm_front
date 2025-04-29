@@ -19,6 +19,9 @@ export type { Paciente } from './pacientesInterface'
 export type { Tratamiento } from './tratamientosInterface'
 export type { Turno } from './turnosInterface'
 
+export type { Alert } from './Alert'
+export type { User, SignupField, ValidationRule } from './authInterfaces'
+
 // Tipos compuestos (opcional, puedes agregar más según necesites)
 export interface TurnoCompleto extends Turno {
   paciente?: Paciente

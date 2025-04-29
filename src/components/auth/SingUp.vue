@@ -28,8 +28,8 @@
             :label="field.label"
             :icon="field.icon"
             :rules="field.rules"
-            :model-value="user[field.name]"
-            @update:model-value="(value) => (user[field.name] = value)"
+            :model-value="getValidModelValue(user[field.name])"
+            @update:model-value="handleInputUpdate(field.name, $event)"
             variant="outlined"
           />
           <v-text-field
@@ -64,19 +64,30 @@
 
 <script lang="ts" setup>
 import { ref } from 'vue'
-import MyAlerts from '../Alertas/MyAlerts.vue'
-import BaseInput from './form/BaseInput.vue'
-import { signupFields } from './form/logic/formSingUp'
 import axios from 'axios'
 import { useTheme } from 'vuetify'
-import { passwordRules } from '../../utils/validationRules'
 
+//Configuraciones
+import { signupFields } from '@/components/auth/form/logic/formSingUp'
+import { passwordRules } from '@/utils/validationRules'
+//Componentes
+import MyAlerts from '@/components/Alertas/MyAlerts.vue'
+import BaseInput from '@/components/auth/form/BaseInput.vue'
+
+import type { SignupField, User } from '@/interfaces'
+
+//referencias
+const theme = useTheme()
 const visible = ref(false)
 
-const theme = useTheme()
-
+const getValidModelValue = (value: unknown) => {
+  if (typeof value === 'string' || typeof value === 'number') {
+    return value
+  }
+  return '' // Retorna un valor por defecto, por ejemplo una cadena vacía si el tipo no es válido
+}
 // Datos del usuario
-const user = ref({
+const user = ref<User>({
   nombre: '',
   email: '',
   telefono: '',
@@ -87,7 +98,11 @@ const user = ref({
   rol_id: 2,
 })
 
-const fields = signupFields // Definición de campos
+const handleInputUpdate = (fieldName: keyof User, value: string | number | undefined) => {
+  user.value[fieldName] = value as never // Conversión segura gracias a keyof User
+}
+
+const fields: SignupField[] = signupFields // Definición de campos
 const alert = ref({
   show: false,
   type: '',

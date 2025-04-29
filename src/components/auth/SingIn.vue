@@ -87,21 +87,22 @@
 <script lang="ts" setup>
 import { ref } from 'vue'
 import { useTheme } from 'vuetify'
-import { emailRules, passwordRules } from '../../utils/validationRules'
-import MyAlerts from '../Alertas/MyAlerts.vue'
-import axiosInstance from '../../config/axios'
-import { useAuth } from '../../composables/useAuth.js'
+import { emailRules, passwordRules } from '@/utils/validationRules'
+import MyAlerts from '@/components/Alertas/MyAlerts.vue'
+import axiosInstance from '@/config/axios'
+import { isAxiosError } from 'axios'
+import { useAuth } from '@/composables/useAuth'
 import { useRouter } from 'vue-router'
 
 // Importar las interfaces de autenticación
-import { User, Alert } from '../auth/interfaces/authInterfaces'
+import type { User, Alert } from '@/interfaces'
 
 const theme = useTheme()
 
 const visible = ref(false)
 
 // Referencias a la forma y datos del usuario
-const signinForm = ref(null)
+const signinForm = ref<{ validate: () => boolean } | null>(null)
 const user = ref<User>({
   email: '',
   password: '',
@@ -141,19 +142,22 @@ const signin = async () => {
         }
       }
     } catch (error) {
-      alert.value = {
-        show: true,
-        type: 'error',
-        message: error.response?.data?.message || 'Ocurrió un error inesperado.',
+      // Verificamos si es un error de Axios
+      if (isAxiosError(error)) {
+        alert.value = {
+          show: true,
+          type: 'error',
+          message: error.response?.data?.message || 'Error en la solicitud',
+        }
+      } else {
+        // Si no es un error de Axios (ej: error de red, sintaxis, etc.)
+        alert.value = {
+          show: true,
+          type: 'error',
+          message: 'Ocurrió un error inesperado',
+        }
       }
     }
-  } else {
-    alert.value = {
-      show: true,
-      type: 'error',
-      message: 'Por favor complete todos los campos correctamente.',
-    }
-    console.log(alert.value)
   }
 }
 </script>

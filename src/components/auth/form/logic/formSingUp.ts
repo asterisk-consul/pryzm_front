@@ -1,7 +1,8 @@
 // src/config/fields.js
-import { nameRules, emailRules } from '../../../../utils/validationRules'
+import type { SignupField } from '@/interfaces'
+import { nameRules, emailRules } from '@/utils/validationRules'
 
-export const signupFields = [
+export const signupFields: SignupField[] = [
   { name: 'nombre', label: 'Nombre', icon: 'mdi-account', rules: nameRules },
   { name: 'email', label: 'E-mail', icon: 'mdi-email', rules: emailRules },
   { name: 'telefono', label: 'Telefono', icon: 'mdi-phone' },
