@@ -1,4 +1,4 @@
-import { Tratamiento } from './tratamientosInterface'
+import type { Tratamiento } from './tratamientosInterface'
 
 // export interface Consultorio {
 //   id_consultorio: number

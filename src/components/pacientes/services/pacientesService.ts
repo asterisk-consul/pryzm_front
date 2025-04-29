@@ -1,3 +1,4 @@
+import type { Paciente } from '@/interfaces'
 import axios from '../../../config/axios'
 
 export const fetchPacientes = async () => {
@@ -10,7 +11,7 @@ export const fetchPacientes = async () => {
   }
 }
 
-export const fetchPacienteId = async (id) => {
+export const fetchPacienteId = async (id: number) => {
   try {
     const response = await axios.get(`/pacientes/${id}`)
     return response.data
@@ -20,7 +21,7 @@ export const fetchPacienteId = async (id) => {
   }
 }
 
-export const savePaciente = async (paciente) => {
+export const savePaciente = async (paciente: Paciente) => {
   try {
     const response = await axios.post('/pacientes', paciente)
     return response.data
@@ -30,7 +31,7 @@ export const savePaciente = async (paciente) => {
   }
 }
 
-export const deletePaciente = async (id) => {
+export const deletePaciente = async (id: number) => {
   try {
     const response = await axios.delete(`/pacientes/${id}`)
     return response.data
@@ -40,7 +41,7 @@ export const deletePaciente = async (id) => {
   }
 }
 
-export const updatePaciente = async (id, paciente) => {
+export const updatePaciente = async (id: number, paciente: Paciente) => {
   try {
     const response = await axios.put(`/pacientes/${id}`, paciente)
     return response.data

@@ -111,7 +111,7 @@
 <script setup lang="ts">
 import { defineEmits } from 'vue'
 import { useTheme } from 'vuetify'
-import { Consultorio } from '@/interfaces/consultorioInterface'
+import type { Consultorio } from '@/interfaces/consultorioInterface'
 
 const theme = useTheme()
 

@@ -1,8 +1,8 @@
-import { Paciente } from './pacientesInterface'
-import { Tratamiento } from './tratamientosInterface'
-import { Turno } from './turnosInterface'
-import { Consultorio } from './consultorioInterface'
-import { Evento, FormattedEvent } from './calendarInterface'
+import type { Paciente } from './pacientesInterface'
+import type { Tratamiento } from './tratamientosInterface'
+import type { Turno } from './turnosInterface'
+import type { Consultorio } from './consultorioInterface'
+import type { Evento, FormattedEvent } from './calendarInterface'
 
 // Tipos y interfaces del calendario
 export type { CalendarView, ViewType } from './calendarInterface'

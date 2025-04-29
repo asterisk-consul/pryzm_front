@@ -1,4 +1,4 @@
-import { Ref } from 'vue'
+import type { Ref } from 'vue'
 
 import axios from '@/config/axios'
 
@@ -6,7 +6,7 @@ import type { Consultorio } from '@/interfaces/consultorioInterface'
 import type { Tratamiento } from '@/interfaces/tratamientosInterface'
 
 export const useServiceConsultorios = () => {
-  const addConsultorio = async (nombre, tratamientos) => {
+  const addConsultorio = async (nombre: string, tratamientos) => {
     try {
       await axios.post('/consultorios', { nombre, tratamientos })
       // Actualiza la lista de consultorios
@@ -93,7 +93,7 @@ export const useServiceConsultorios = () => {
 
       // Transforma la respuesta para cambiar nombre_tratamiento a nombre
       const tratamientos =
-        response.data?.map((tratamiento) => ({
+        response.data?.map((tratamiento: Tratamiento) => ({
           ...tratamiento,
           nombre: tratamiento.nombre_tratamiento, // Mapea nombre_tratamiento a nombre
           // Elimina el campo nombre_tratamiento si lo deseas (opcional)

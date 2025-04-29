@@ -1,6 +1,6 @@
 import axios from '@/config/axios'
 // import { Ref } from 'vue'
-import { Turno } from '@/interfaces/turnosInterface'
+import type { Turno } from '@/interfaces/turnosInterface'
 
 export const useServiceTurnos = () => {
   const getTurnos = async (): Promise<Turno[]> => {

@@ -1,5 +1,5 @@
 // calendarEventHandlers.ts
-import { Ref } from 'vue'
+import type { Ref } from 'vue'
 import { storeToRefs } from 'pinia'
 import type { Turno, Evento } from '@/interfaces'
 import { useCalendarEventsStore } from '@/stores/calendarEventsStore'

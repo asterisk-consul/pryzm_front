@@ -11,7 +11,7 @@
       border: `1px solid ${theme.global.current.value.colors.border}`,
     }"
   >
-    <template v-slot:item.actions="{ item }">
+    <template v-slot:[`item.actions`]="{ item }">
       <!-- Botón para editar y eliminar -->
       <v-icon class="me-2" size="small" @click="abrirDialogEditar(item)">mdi-pencil</v-icon>
       <v-icon size="small" @click="abrirDialogEliminar(item)">mdi-delete</v-icon>
@@ -19,30 +19,23 @@
   </v-data-table>
 
   <!-- Diálogo de Confirmación -->
-  <v-dialog v-model="dialogVisible" max-width="900">
-    <DialogoConfirmacion
-      :paciente="pacienteSeleccionado"
-      @confirmar="confirmarEliminar"
-      @cancelar="cerrarDialog"
-    />
-  </v-dialog>
+  <DialogoConfirmacion
+    :dialog="dialog"
+    :paciente="pacienteSeleccionado"
+    @confirmar="confirmarEliminar"
+    @cancelar="cerrarDialog"
+  />
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue'
 import { headers } from './constants/headers'
 import { useTheme } from 'vuetify'
-import DialogoConfirmacion from './DialogoConfirmacion.vue'
+import type { Paciente } from '@/interfaces'
+import DialogoConfirmacion from './DialogConfirmacion.vue'
 
 const theme = useTheme()
 // Define el tipo de "pacientes" que es un arreglo de objetos
-interface Paciente {
-  id_paciente: number
-  nombre: string
-  edad: number
-  direccion: string
-  telefono: string
-}
 
 defineProps({
   pacientes: {
@@ -53,7 +46,7 @@ defineProps({
 
 const emit = defineEmits(['abrir-dialog-editar', 'eliminar-paciente'])
 
-const dialogVisible = ref(false)
+const dialog = ref(false)
 const pacienteSeleccionado = ref<Paciente | null>(null)
 
 const abrirDialogEditar = (item: Paciente) => {
@@ -62,7 +55,8 @@ const abrirDialogEditar = (item: Paciente) => {
 
 const abrirDialogEliminar = (item: Paciente) => {
   pacienteSeleccionado.value = item
-  dialogVisible.value = true
+  dialog.value = true
+  console.log('Paciente a eliminar:', pacienteSeleccionado.value)
 }
 
 const confirmarEliminar = () => {
@@ -73,7 +67,7 @@ const confirmarEliminar = () => {
 }
 
 const cerrarDialog = () => {
-  dialogVisible.value = false
+  dialog.value = false
   pacienteSeleccionado.value = null
 }
 </script>

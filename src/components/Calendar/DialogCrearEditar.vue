@@ -56,9 +56,13 @@
           required
         >
           <template v-slot:item="{ props, item }">
-            <v-list-item v-bind="props" :title="item.raw.nombre" :prepend-avatar="item.raw.color">
+            <v-list-item
+              v-bind="props"
+              :title="item.raw.nombre"
+              :prepend-avatar="item.raw.color || undefined"
+            >
               <template v-slot:prepend>
-                <v-avatar :color="item.raw.color" size="12" class="mr-2"></v-avatar>
+                <v-avatar :color="item.raw.color || undefined" size="12" class="mr-2"></v-avatar>
               </template>
             </v-list-item>
           </template>
@@ -189,7 +193,7 @@ const nuevoTurno = ref<Turno>({
 })
 const menuFecha = ref(false)
 const menuHora = ref(false)
-const tratamientoSeleccionado = ref({
+const tratamientoSeleccionado = ref<Tratamiento>({
   duracion: null,
   costo: null,
 })
@@ -217,7 +221,7 @@ const deleteTurno = () => {
   cerrarDialog()
 }
 
-const formatearNombrePaciente = (paciente) => {
+const formatearNombrePaciente = (paciente: Paciente) => {
   return `${paciente.nombre} ${paciente.apellido}`
 }
 
@@ -313,7 +317,7 @@ const horaFormateada = computed(() => {
 })
 
 onMounted(() => {
-  if (isEdit.value) {
+  if (isEdit.value && nuevoTurno.value.id_consultorio !== null) {
     cargarTratamientosPorConsultorio(nuevoTurno.value.id_consultorio)
   }
 })

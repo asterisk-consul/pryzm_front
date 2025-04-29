@@ -1,6 +1,6 @@
 import axios from '@/config/axios'
-import { Ref } from 'vue'
-import { Paciente } from '@/interfaces/pacientesInterface'
+import type { Ref } from 'vue'
+import type { Paciente } from '@/interfaces/pacientesInterface'
 
 export const useServicePacientes = (pacientes: Ref<Paciente[]>) => {
   const cargarPacientes = async () => {

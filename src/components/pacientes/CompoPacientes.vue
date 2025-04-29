@@ -30,118 +30,81 @@
       />
     </v-row>
     <!-- v-dialog para mostrar la ventana emergente -->
-    <v-dialog v-model="dialogPaciente" max-width="1000px">
-      <DialogPaciente
-        :isEdit="!!pacienteData"
-        :pacienteEditar="pacienteData"
-        @paciente-agregado="agregarPaciente"
-        @paciente-editado="actualizarPaciente"
-        @close-dialog="cerrarDialogPaciente"
-      />
-    </v-dialog>
+    <DialogPaciente
+      :dialog="dialog"
+      :isEdit="isEdit"
+      :pacienteEditar="pacienteSeleccionado"
+      @paciente-agregado="agregarPaciente"
+      @paciente-editado="actualizarPaciente"
+      @close-dialog="cerrarDialogPaciente"
+    />
   </v-container>
 </template>
 
 <script lang="ts" setup>
+import { isAxiosError } from 'axios'
+import { storeToRefs } from 'pinia'
 import { ref, onMounted } from 'vue'
-import { useDialog } from '../../composables/useDialog'
 import { useTheme } from 'vuetify'
+
+import type { Paciente } from '@/interfaces'
 
 const theme = useTheme()
 
 // Importar los componentes
 import TablaPacientes from './TablaPacientes.vue'
-import DialogPaciente from './DialogPaciente.vue'
+import DialogPaciente from './DialogPacientes.vue'
 
-// Importar los servicios
-import {
-  fetchPacientes,
-  // fetchPacienteId,
-  savePaciente,
-  deletePaciente,
-  updatePaciente,
-} from './services/pacientesService'
+import { usePacientesStore } from '@/stores/pacientesStores'
+// import { fetchPacientes } from './services/pacientesService'
 
-// Definir la lista de pacientes
-const pacientes = ref([])
+const pacientesStore = usePacientesStore()
 
-// Función para cargar pacientes
-const cargarPacientes = async () => {
-  try {
-    const pacientesData = await fetchPacientes()
-    pacientes.value = pacientesData || []
-  } catch (error) {
-    console.error('Error al cargar pacientes:', error)
-    pacientes.value = []
-  }
-}
+const { pacientes } = storeToRefs(pacientesStore)
 
-const {
-  dialog: dialogPaciente,
-  data: pacienteData,
-  abrirDialog,
-  cerrarDialog,
-  cancelDialog: cerrarDialogPaciente,
-} = useDialog()
+const { fetchPacientes, savePaciente, deletePaciente, updatePaciente } = pacientesStore
 
-//Metodos
+const dialog = ref(false)
+const isEdit = ref(false)
+const pacienteSeleccionado = ref<Paciente | null>(null)
+
 const abrirDialogAgregar = () => {
-  abrirDialog() // Pasar los datos del paciente al abrir el diálogo
+  dialog.value = true
 }
 
-const abrirDialogEditar = (paciente) => {
-  pacienteData.value = paciente
-  abrirDialog(pacienteData.value) // Pasar los datos del paciente al abrir el diálogo
+const cerrarDialogPaciente = () => {
+  dialog.value = false
+  isEdit.value = false
 }
-// Función para agregar un nuevo paciente
-const agregarPaciente = async (nuevoPaciente) => {
+
+const abrirDialogEditar = (paciente: Paciente) => {
+  pacienteSeleccionado.value = paciente
+  isEdit.value = true
+  dialog.value = true // Pasar los datos del paciente al abrir el diálogo
+}
+
+const agregarPaciente = async (nuevo: Paciente) => {
   try {
-    // Llamar al backend para guardar el paciente
-    const pacienteGuardado = await savePaciente(nuevoPaciente)
-
-    pacientes.value.push(pacienteGuardado)
-    pacientes.value.sort((a, b) => {
-      // Ordenar según el campo que desees, por ejemplo, por 'id_paciente'
-      return a.id_paciente - b.id_paciente // Ascendente
-    })
-
-    cerrarDialog() // Cierra el diálogo después de que Vue haya actualizado el DOM
-    // Cerrar el diálogo después de agregar el paciente
+    // Llamada asíncrona para guardar el paciente en el servidor
+    await savePaciente(nuevo)
+    dialog.value = false
   } catch (error) {
     console.error('Error al agregar el paciente:', error)
   }
 }
 // Función para actualizar un paciente editado
-const actualizarPaciente = async (pacienteEditado) => {
+const actualizarPaciente = async (paciente: Paciente) => {
   try {
-    // Llamada asíncrona para actualizar el paciente en el servidor
-    await updatePaciente(pacienteEditado.id_paciente, pacienteEditado)
-
-    // Buscar el índice del paciente en el array
-    const index = pacientes.value.findIndex((p) => p.id_paciente === pacienteEditado.id_paciente)
-
-    if (index !== -1) {
-      // Actualizar solo las propiedades del paciente en el array local sin moverlo
-      pacientes.value[index] = {
-        ...pacientes.value[index],
-        ...pacienteEditado,
-      }
-    } else {
-      console.error('Paciente no encontrado en la lista.')
-    }
-
-    cerrarDialog() // Cerrar el diálogo después de la edición
+    await updatePaciente(paciente)
+    dialog.value = false
   } catch (error) {
     console.error('Error al actualizar el paciente:', error)
   }
 }
 // Función para eliminar un paciente
-const eliminar = async (item) => {
+const eliminar = async (item: Paciente) => {
   try {
-    // Elimina el paciente en el servidor usando la API
-    console.log('Paciente eliminado:', item)
-    console.log('Pacientes:', pacientes.value)
-    await deletePaciente(item)
+    await deletePaciente(item.id_paciente)
 
     // Elimina el paciente de la lista localmente
     const index = pacientes.value.findIndex((p) => p.id_paciente === Number(item))
@@ -152,8 +115,9 @@ const eliminar = async (item) => {
     }
   } catch (error) {
     console.error('Error al eliminar el paciente:', error)
-    // Verificar si el error es un error específico de relación
-    if (error.response && error.response.status === 400) {
+
+    // Verificación de tipo segura
+    if (isAxiosError(error) && error.response?.status === 400) {
       alert('No se puede eliminar el paciente porque tiene turnos asociados.')
     } else {
       alert('Hubo un error al eliminar el paciente. Inténtalo nuevamente.')
@@ -162,6 +126,41 @@ const eliminar = async (item) => {
 }
 
 onMounted(() => {
-  cargarPacientes()
+  fetchPacientes()
 })
+
+// // Importar los servicios
+// import {
+//   fetchPacientes,
+//   // fetchPacienteId,
+//   savePaciente,
+//   deletePaciente,
+//   updatePaciente,
+// } from './services/pacientesService'
+
+// Definir la lista de pacientes
+// const pacientes = ref([])
+
+// Función para cargar pacientes
+// const cargarPacientes = async () => {
+//   try {
+//     const pacientesData = await fetchPacientes()
+//     pacientes.value = pacientesData || []
+//   } catch (error) {
+//     console.error('Error al cargar pacientes:', error)
+//     pacientes.value = []
+//   }
+// }
+
+// const {
+//   dialog: dialogPaciente,
+//   data: pacienteData,
+//   abrirDialog,
+//   cerrarDialog,
+//   cancelDialog: cerrarDialogPaciente,
+// } = useDialog()
+
+//Metodos
+
+// Función para agregar un nuevo paciente
 </script>

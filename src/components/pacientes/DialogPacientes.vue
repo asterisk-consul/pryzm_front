@@ -1,10 +1,45 @@
 <template>
-  <v-card>
-    <v-card-title>
-      <span class="text-h5">
-        {{ isEdit ? 'Editar Paciente' : 'Agregar Paciente' }}
-      </span>
-    </v-card-title>
+  <v-navigation-drawer
+    v-model="dialog"
+    :hide-overlay="true"
+    absolute
+    temporary
+    location="right"
+    expand-on-hover
+    close-delay="100"
+    scrim="#00000000"
+    width="500"
+    transition="slide-x-reverse-transition"
+    height="100vh"
+    :style="{ overflow: 'visible', zIndex: '2000', top: '0', height: '100%' }"
+  >
+    <v-toolbar
+      :style="{
+        backgroundColor: theme.global.current.value.colors.background,
+        borderBottom: `1px solid ${theme.global.current.value.colors.border}`,
+        paddingLeft: '15px',
+        paddingTop: '5px',
+        height: '70px',
+        width: '100%',
+      }"
+    >
+      <div class="d-flex align-center justify-lg-space-around" style="width: 100%">
+        <div class="mr-1">
+          <span
+            :style="{ color: theme.global.current.value.colors['on-background'], fontSize: '20px' }"
+            >Configurar calendario</span
+          >
+          <br />
+          <span
+            :style="{ color: theme.global.current.value.colors['on-background'], fontSize: '14px' }"
+            >Personalizar y Previsualizar en Tiempo Real</span
+          >
+        </div>
+        <v-btn icon dark @click="cancelar">
+          <v-icon>mdi-close</v-icon>
+        </v-btn>
+      </div>
+    </v-toolbar>
     <v-card-text>
       <v-form ref="form" v-model="valid">
         <v-text-field
@@ -44,12 +79,12 @@
           :rules="[rules.required]"
           required
         ></v-text-field>
-        <v-textarea
+        <v-text-field
           v-model="paciente.direccion"
           label="Dirección"
           :rules="[rules.required]"
           required
-        ></v-textarea>
+        ></v-text-field>
       </v-form>
     </v-card-text>
     <v-card-actions>
@@ -59,20 +94,26 @@
         isEdit ? 'Modificar' : 'Agregar'
       }}</v-btn>
     </v-card-actions>
-  </v-card>
+  </v-navigation-drawer>
 </template>
 
-<script setup>
-import { ref, watch } from 'vue'
+<script setup lang="ts">
+import { ref, toRefs, watch } from 'vue'
 import { defineProps, defineEmits } from 'vue'
+import type { Paciente } from '@/interfaces'
+import { useTheme } from 'vuetify'
+const theme = useTheme()
 
 // Props y eventos
 const emit = defineEmits(['paciente-editado', 'paciente-agregado', 'close-dialog'])
 
-const props = defineProps({
-  isEdit: Boolean, // Determina si estamos editando o agregando un paciente
-  pacienteEditar: Object, // Información del paciente a editar
-})
+const props = defineProps<{
+  isEdit: boolean // Determina si estamos editando o agregando un paciente
+  pacienteEditar?: Paciente | null // Información del paciente a editar
+  dialog: boolean
+}>()
+
+const { isEdit, dialog } = toRefs(props)
 
 const paciente = ref({
   nombre: '',
@@ -108,7 +149,7 @@ watch(
 const valid = ref(true)
 
 const rules = {
-  required: (value) => !!value || 'Campo requerido',
+  required: (value: boolean) => !!value || 'Campo requerido',
 }
 
 // Función para cancelar la operación
