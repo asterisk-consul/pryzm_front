@@ -105,7 +105,11 @@ const dialogs = ref({
 
 const isEdit = ref(false)
 
-const consultorioActivo = ref<Consultorio | null>(null)
+const consultorioActivo = ref<Consultorio>({
+  id_consultorio: 0,
+  nombre_consultorio: '',
+  tratamientos: [],
+})
 const newConsultorio = ref('')
 const selectedTratamientos = ref<Tratamiento[]>([])
 // const consultorioToEdit = ref<number | null>(null)
@@ -152,7 +156,7 @@ const editarConsultorio = (consultorio: Consultorio) => {
       : []
 }
 
-const createConsultorio = async (formData) => {
+const createConsultorio = async (formData: Consultorio) => {
   if (isEdit.value) {
     // Modo edición: Actualizar el consultorio existente
     await updateConsultorio(formData)
@@ -168,7 +172,7 @@ const createConsultorio = async (formData) => {
 
 const confirmarEliminacion = async () => {
   try {
-    await deleteConsultorio(consultorioActivo.value)
+    await deleteConsultorio(consultorioActivo.value as Consultorio)
     await fetchConsultoriosyTratamientos(consultorios)
     dialogs.value.eliminar = false
     await store.cargarDatos()

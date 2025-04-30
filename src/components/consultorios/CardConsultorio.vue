@@ -36,7 +36,7 @@
               <v-chip
                 v-for="tratamiento in consultorio.tratamientos.slice(0, 3)"
                 :key="tratamiento.id_tratamiento"
-                :color="tratamiento.color"
+                :color="tratamiento.color || 'primary'"
                 text-color="black"
                 style="min-width: 120px; justify-content: start; flex-grow: 1"
               >

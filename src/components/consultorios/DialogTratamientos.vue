@@ -19,7 +19,7 @@
         <v-chip
           v-for="tratamiento in consultorioActivo.tratamientos"
           :key="tratamiento.id_tratamiento"
-          :color="tratamiento.color"
+          :color="tratamiento.color || 'primary'"
           text-color="black"
           class="mb-2 mr-2"
         >

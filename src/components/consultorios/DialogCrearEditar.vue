@@ -28,9 +28,9 @@
       >
         <template v-slot:selection="{ item }">
           <v-chip
-            :color="item.raw.color"
+            :color="item.raw.color || ''"
             closable
-            @click:close="removeTratamiento(item.raw.id_tratamiento)"
+            @click:close="removeTratamiento(item.raw.id_tratamiento as number)"
           >
             {{ item.title }}
           </v-chip>
@@ -40,7 +40,7 @@
           <v-list-item
             v-bind="props"
             :title="item.raw.nombre"
-            :prepend-avatar="item.raw.color"
+            :prepend-avatar="item.raw.color || undefined"
             tile
             :style="{
               color: theme.global.current.value.colors['on-background'],
@@ -50,7 +50,7 @@
             }"
           >
             <template v-slot:prepend>
-              <v-avatar :color="item.raw.color" size="12" class="mr-2"></v-avatar>
+              <v-avatar :color="item.raw.color || undefined" size="12" class="mr-2"></v-avatar>
             </template>
           </v-list-item>
         </template>
