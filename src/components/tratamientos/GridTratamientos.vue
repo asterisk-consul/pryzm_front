@@ -19,7 +19,7 @@
     transition="slide-x-transition"
   >
     <DialogCrearEditar
-      :tratamiento="tratamientoActivo"
+      :tratamiento="tratamientoActivo || {}"
       :is-edit="isEdit"
       @close-dialog="dialogs.tratamientos = false"
       @create-tratamiento="createTratamiento"
@@ -35,7 +35,7 @@
     transition="dialog-transition"
   >
     <DialogEliminar
-      :tratamiento-activo="tratamientoActivo"
+      :tratamiento-activo="tratamientoActivo || {}"
       @confirmar-eliminacion="confirmarEliminacion"
       @cerrar-dialogo="dialogs.eliminar = false"
     />
@@ -84,7 +84,7 @@ const handleCreateTratamiento = () => {
   isEdit.value = false
 }
 
-const abrirDialogborrar = (tratamiento) => {
+const abrirDialogborrar = (tratamiento: Tratamiento) => {
   tratamientoActivo.value = tratamiento
   dialogs.value.eliminar = true
 }
@@ -95,12 +95,12 @@ const abrirDialogEditar = async (tratamiento: Tratamiento) => {
 }
 
 const confirmarEliminacion = async () => {
-  await eliminarTratamiento(tratamientoActivo.value)
+  await eliminarTratamiento(tratamientoActivo.value as Tratamiento)
   dialogs.value.eliminar = false
   await store.cargarDatos()
 }
 
-const createTratamiento = async (tratamiento) => {
+const createTratamiento = async (tratamiento: Tratamiento) => {
   const { nombre, descripcion, costo, duracion, color } = tratamiento
   if (isEdit.value) {
     // Modo edición: Actualizar el consultorio existente
@@ -108,7 +108,13 @@ const createTratamiento = async (tratamiento) => {
     await store.cargarDatos()
   } else {
     // Modo creación: Crear un nuevo consultorio
-    await addTratamiento(nombre, descripcion, costo, duracion, color)
+    await addTratamiento(
+      nombre || '',
+      descripcion || '',
+      costo || 0,
+      Number(duracion) || 0,
+      color || '',
+    )
     await store.cargarDatos()
   }
   dialogs.value.tratamientos = false // Cerrar el diálogo

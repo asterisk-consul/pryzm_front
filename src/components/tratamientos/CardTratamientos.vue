@@ -6,12 +6,12 @@
   >
     <v-card
       v-bind="props"
-      :color="tratamiento.color"
+      :color="tratamiento.color || 'primary'"
       class="ma-2 pa-2 d-flex flex-column justify-center align-center"
       style="position: relative"
     >
       <v-card-title class="text-h6 font-weight-bold ma-0 pa-0">{{
-        tratamiento.nombre.toUpperCase()
+        tratamiento.nombre?.toUpperCase() || 'NO TIENE NOMBRE'
       }}</v-card-title>
 
       <v-card-subtitle class="text-subtitle-1 ma-0 pa-0">{{
