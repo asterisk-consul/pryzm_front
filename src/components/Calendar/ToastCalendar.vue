@@ -30,7 +30,9 @@
       >
         <ChecklistFiltro
           v-model="consultorioFiltro"
-          :items="consultoriosDisponibles.map((c) => ({ text: c, value: c }))"
+          :items="
+            consultoriosDisponibles.filter((c) => c !== null).map((c) => ({ text: c, value: c }))
+          "
           class="filtro-consultorios"
         />
       </v-col>
@@ -92,7 +94,8 @@
 <script lang="ts" setup>
 // IMPORTS
 import { storeToRefs } from 'pinia'
-import { ref, onMounted, computed, watch, CSSProperties } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
+import type { CSSProperties } from 'vue'
 
 // CALENDARIO
 import TuiCalendar from 'toast-ui-calendar-vue3'
@@ -434,7 +437,7 @@ onMounted(async () => {
   calendarStore.updateHoras()
 
   const editableTheme = JSON.parse(JSON.stringify(myTheme.value))
-  calendarInstance.value.setTheme(editableTheme)
+  calendarInstance.value?.setTheme(editableTheme)
 
   mostrarCalendario.value = true
 })

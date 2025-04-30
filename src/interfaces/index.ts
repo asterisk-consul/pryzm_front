@@ -12,6 +12,9 @@ export type { CalendarInstance } from './calendarInterface'
 export type { Calendar } from './calendarInterface'
 export type { Evento } from './calendarInterface'
 export type { FormattedEvent } from './calendarInterface'
+export type { TemplateMonthDayName } from './interfacesTuiCalendar'
+export type { TemplateMoreTitleDate } from './interfacesTuiCalendar'
+export type { TemplateNow } from './interfacesTuiCalendar'
 
 // Interfaces de entidades principales
 export type { Consultorio } from './consultorioInterface'

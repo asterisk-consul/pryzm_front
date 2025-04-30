@@ -33,8 +33,9 @@ export const createEventHandlers = (
       costo_tratamiento: number | null
     }
 
-    const startDate = fullEvent.start instanceof Date ? fullEvent.start : new Date(fullEvent.start)
-    const endDate = fullEvent.end instanceof Date ? fullEvent.end : new Date(fullEvent.end)
+    const startDate =
+      fullEvent.start instanceof Date ? fullEvent.start : new Date(fullEvent.start || '')
+    const endDate = fullEvent.end instanceof Date ? fullEvent.end : new Date(fullEvent.end || '')
 
     const durationMinutes =
       endDate && startDate ? (endDate.getTime() - startDate.getTime()) / 60000 : 0
@@ -43,14 +44,14 @@ export const createEventHandlers = (
     const formatTime = (date: Date) => date.toTimeString().slice(0, 5)
 
     turnoActivo.value = {
-      id_turno: parseInt(fullEvent.id),
+      id_turno: Number(fullEvent.id),
       id_paciente: raw.id_paciente,
       id_consultorio: raw.id_consultorio,
       id_tratamiento: raw.id_tratamiento,
       fecha: formatDate(startDate),
       hora: formatTime(startDate),
-      nombre_tratamiento: fullEvent.body,
-      color_tratamiento: fullEvent.backgroundColor,
+      nombre_tratamiento: fullEvent.body || '',
+      color_tratamiento: fullEvent.backgroundColor || '',
       duracion_tratamiento: durationMinutes,
       nombre_consultorio: calendars.value.find((c) => c.id === fullEvent.calendarId)?.name || '',
       estado: raw.estado,
@@ -70,7 +71,7 @@ export const createEventHandlers = (
     }
 
     const { start, calendarId, id_consultorio } = eventData
-    const dateStart = start instanceof Date ? start : new Date(start)
+    const dateStart = start instanceof Date ? start : new Date(start || '')
     const fecha = dateStart.toISOString().split('T')[0]
     const hora = dateStart.toTimeString().slice(0, 5)
 
@@ -79,11 +80,11 @@ export const createEventHandlers = (
     turnoActivo.value = {
       fecha: fecha,
       hora: hora,
-      id_consultorio,
+      id_consultorio: Number(id_consultorio),
       estado: 'pendiente',
       id_paciente: null,
       id_tratamiento: null,
-      nombre_consultorio: consultorio,
+      nombre_consultorio: consultorio || '',
       nombre_tratamiento: '',
       duracion_tratamiento: null,
       nombre_paciente: '',
@@ -132,14 +133,14 @@ export const createEventHandlers = (
       const durationMinutes = (endDate.getTime() - startDate.getTime()) / 60000
 
       const turnoToUpdate: Turno = {
-        id_turno: parseInt(updatedEvent.id),
+        id_turno: Number(updatedEvent.id),
         id_paciente: raw.id_paciente,
         id_consultorio: raw.id_consultorio,
         id_tratamiento: raw.id_tratamiento,
         fecha: startDate.toISOString().split('T')[0],
         hora: startDate.toTimeString().slice(0, 5),
-        nombre_tratamiento: updatedEvent.body,
-        color_tratamiento: updatedEvent.backgroundColor,
+        nombre_tratamiento: updatedEvent.body || '',
+        color_tratamiento: updatedEvent.backgroundColor || '',
         duracion_tratamiento: durationMinutes,
         nombre_consultorio:
           calendars.value.find((c) => c.id === updatedEvent.calendarId)?.name || '',

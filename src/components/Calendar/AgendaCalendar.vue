@@ -52,7 +52,9 @@
                     fontSize: '0.9rem',
                   }"
                   >{{
-                    formatTime(new Date(event.start)) + ' - ' + formatTime(new Date(event.end))
+                    formatTime(new Date(event.start || '')) +
+                    ' - ' +
+                    formatTime(new Date(event.end || ''))
                   }}</span
                 >
                 <v-avatar :color="event.backgroundColor" size="10" class="me-3"></v-avatar>
@@ -77,7 +79,7 @@
 import { storeToRefs } from 'pinia'
 import { computed, toRefs } from 'vue'
 import { useCalendarEventsStore } from '@/stores/calendarEventsStore'
-import { Evento } from '../../interfaces/calendarInterface'
+import type { Evento } from '@/interfaces'
 
 // Import theme
 import { useTheme } from 'vuetify'
@@ -107,7 +109,7 @@ const groupedEventsByMonth = computed(() => {
   const targetYear = currentDate.value.getFullYear()
 
   for (const event of events.value) {
-    const date = new Date(event.start)
+    const date = new Date(event.start || '')
     const eventMonth = date.getMonth()
     const eventYear = date.getFullYear()
 
@@ -124,7 +126,9 @@ const groupedEventsByMonth = computed(() => {
 // Ordenar eventos por hora
 const sortedEvents = (events: Evento[] = []) => {
   if (!Array.isArray(events)) return []
-  return [...events].sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime())
+  return [...events].sort(
+    (a, b) => new Date(a.start || '').getTime() - new Date(b.start || '').getTime(),
+  )
 }
 
 const showEvent = (event: Evento) => {

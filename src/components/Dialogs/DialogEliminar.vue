@@ -115,12 +115,14 @@ const emit = defineEmits(['update:modelValue', 'confirm', 'close'])
 const entityDisplayName = computed(() => {
   if (!props.entity) return ''
 
-  // Busca en los campos definidos en nameFields
+  const entity = props.entity as Record<string, unknown>
+
   for (const field of props.nameFields) {
-    if (props.entity[field]) return props.entity[field]
+    const value = entity[field]
+    if (typeof value === 'string') return value
   }
 
-  return '' // Si no encuentra ningún campo con nombre
+  return ''
 })
 
 const dialog = computed({

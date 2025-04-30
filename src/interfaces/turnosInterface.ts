@@ -5,8 +5,8 @@ export interface Turno {
   id_tratamiento: number | null
   fecha: string
   hora: string
-  nombre_consultorio: string
-  nombre_tratamiento: string
+  nombre_consultorio: string | null
+  nombre_tratamiento: string | null
   duracion_tratamiento: number | null
   estado: string
   nombre_paciente: string

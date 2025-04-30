@@ -1,9 +1,10 @@
 import { computed } from 'vue'
 import { useTheme } from 'vuetify'
 
-import type { Evento } from '@/interfaces/index'
+import type { Evento, TemplateMonthDayName, TemplateMoreTitleDate } from '@/interfaces'
 import { formatTime } from '@/utils/formatDateTime'
 import { ColorUtils } from '@/utils/colorUtils'
+import type { TemplateNow, TemplateWeekDayName } from '@/interfaces/interfacesTuiCalendar'
 
 export function useCalendarOptions() {
   const theme = useTheme()
@@ -37,7 +38,7 @@ export function useCalendarOptions() {
 
   const calendarTemplate = {
     // Template para eventos en la vista mensual
-    monthDayName(model) {
+    monthDayName(model: TemplateMonthDayName) {
       return `
           <div style=" font-size: 1rem; padding-top: 9px;
                 display: flex; justify-content: center; align-items: center;
@@ -45,7 +46,7 @@ export function useCalendarOptions() {
       ${model.label}
     </div>`
     },
-    monthMoreTitleDate(moreTitle) {
+    monthMoreTitleDate(moreTitle: TemplateMoreTitleDate) {
       const { date, day } = moreTitle
 
       // Mapa de días de la semana en español
@@ -67,21 +68,21 @@ export function useCalendarOptions() {
         </button>
       `
     },
-    monthGridHeaderExceed(hiddenEvents) {
+    monthGridHeaderExceed(hiddenEvents: Evento[]) {
       return `<span>${hiddenEvents} more</span>`
     },
 
-    weekGridFooterExceed(hiddenEvents) {
+    weekGridFooterExceed(hiddenEvents: Evento[]) {
       return `+${hiddenEvents}`
     },
 
-    timegridDisplayPrimaryTime({ time }) {
+    timegridDisplayPrimaryTime({ time }: TemplateNow) {
       // Formatea la hora para mostrar cada 30 minutos claramente
       const hours = time.getHours()
       const minutes = time.getMinutes()
       return `${hours}:${minutes < 10 ? '0' + minutes : minutes}`
     },
-    weekDayName(model) {
+    weekDayName(model: TemplateWeekDayName) {
       const dateObj = model.dateInstance.d
       const day = dateObj.getDate()
       const month = dateObj.getMonth() + 1
@@ -89,8 +90,14 @@ export function useCalendarOptions() {
       return `<span style="font-weight: bold; font-size: 1.2rem">${day}/${month}</span>&nbsp;&nbsp;<span style=" font-size: 1.2rem">${dayName}</span>`
     },
     time(event: Evento) {
-      return `<div class="toastui-calendar-weekday-event" style="--border-color: ${event.color};color: ${ColorUtils.increaseVibrancy(event.dragBackgroundColor, 0.2)}; font-weight: bold; --bg-color: ${ColorUtils.reduceOpacity(ColorUtils.darkenColor(event.backgroundColor, 0.3), 0.2)}; border-radius: 4px; padding: 2px;"><div class="toastui-calendar-weekday-event-title">
-      ${formatTime(new Date(event.start))} : ${event.title.toUpperCase()}
+      const defaultColor = '#cccccc' // Color gris por defecto
+      const dragBgColor = event.dragBackgroundColor || defaultColor
+      const bgColor = event.backgroundColor || defaultColor
+      const safeTitle = event.title?.toUpperCase() ?? 'SIN TÍTULO'
+      const safeStart = event.start ? new Date(event.start) : new Date()
+
+      return `<div class="toastui-calendar-weekday-event" style="--border-color: ${event.color};color: ${ColorUtils.increaseVibrancy(dragBgColor, 0.2)}; font-weight: bold; --bg-color: ${ColorUtils.reduceOpacity(ColorUtils.darkenColor(bgColor, 0.3), 0.2)}; border-radius: 4px; padding: 2px;"><div class="toastui-calendar-weekday-event-title">
+      ${formatTime(safeStart)} : ${safeTitle}
     </div></div>`
     },
   }

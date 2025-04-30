@@ -1,11 +1,12 @@
+import type { User } from '@/interfaces'
 import { ref } from 'vue'
 
 const isAuthenticated = ref(!!sessionStorage.getItem('session'))
-const user = ref(JSON.parse(sessionStorage.getItem('session')) || null)
+const user = ref(JSON.parse(sessionStorage.getItem('session') ?? 'null') || null)
 
 export function useAuth() {
   // Función para iniciar sesión
-  const login = (userData) => {
+  const login = (userData: User) => {
     user.value = userData
     isAuthenticated.value = true
     sessionStorage.setItem('session', JSON.stringify(userData))
@@ -20,7 +21,7 @@ export function useAuth() {
 
   // Observa cambios en la sesión (por si quieres alguna lógica extra)
   const refreshAuth = () => {
-    user.value = JSON.parse(sessionStorage.getItem('session')) || null
+    user.value = JSON.parse(sessionStorage.getItem('session') ?? 'null') || null
     isAuthenticated.value = !!user.value
   }
 
