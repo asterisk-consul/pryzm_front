@@ -114,13 +114,14 @@
 <script setup lang="ts">
 import { defineEmits, ref, toRefs, computed, watch } from 'vue'
 import { useTheme } from 'vuetify'
+import type { Tratamiento } from '@/interfaces'
 
 const theme = useTheme()
 
-const props = defineProps({
-  isEdit: Boolean,
-  tratamiento: Object,
-})
+const props = defineProps<{
+  isEdit: boolean
+  tratamiento: Tratamiento
+}>()
 
 const { isEdit, tratamiento } = toRefs(props)
 

@@ -7,6 +7,7 @@
     <v-card
       v-bind="props"
       :color="tratamiento.color || 'primary'"
+      :color="tratamiento.color || 'primary'"
       class="ma-2 pa-2 d-flex flex-column justify-center align-center"
       style="position: relative"
     >
