@@ -3,6 +3,7 @@ import type { Tratamiento } from './tratamientosInterface'
 import type { Turno } from './turnosInterface'
 import type { Consultorio } from './consultorioInterface'
 import type { Evento, FormattedEvent } from './calendarInterface'
+import { TratamientoApi } from './tratamientosInterface'
 
 // Tipos y interfaces del calendario
 export type { CalendarView, ViewType } from './calendarInterface'
@@ -20,6 +21,7 @@ export type { TemplateNow } from './interfacesTuiCalendar'
 export type { Consultorio } from './consultorioInterface'
 export type { Paciente } from './pacientesInterface'
 export type { Tratamiento } from './tratamientosInterface'
+export type { TratamientoApi } from './tratamientosInterface'
 export type { Turno } from './turnosInterface'
 
 export type { Alert } from './Alert'

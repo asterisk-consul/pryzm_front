@@ -3,10 +3,10 @@ import type { Ref } from 'vue'
 import axios from '@/config/axios'
 
 import type { Consultorio } from '@/interfaces/consultorioInterface'
-import type { Tratamiento } from '@/interfaces/tratamientosInterface'
+import type { Tratamiento, TratamientoApi } from '@/interfaces/tratamientosInterface'
 
 export const useServiceConsultorios = () => {
-  const addConsultorio = async (nombre: string, tratamientos) => {
+  const addConsultorio = async (nombre: string, tratamientos: Tratamiento[]) => {
     try {
       await axios.post('/consultorios', { nombre, tratamientos })
       // Actualiza la lista de consultorios
@@ -67,7 +67,7 @@ export const useServiceConsultorios = () => {
             color: tratamiento.color,
           })),
         }))
-        .sort((a: Consultorio, b: Consultorio) => a.id_consultorio - b.id_consultorio)
+        .sort((a: Consultorio, b: Consultorio) => (a.id_consultorio ?? 0) - (b.id_consultorio ?? 0))
     } catch (error) {
       console.error('Error fetching consultorios and tratamientos:', error)
       // Consider setting consultorios.value to an empty array here if you want to clear the list on error
@@ -79,7 +79,7 @@ export const useServiceConsultorios = () => {
     try {
       const response = await axios.get('/tratamientos')
       Tratamientos.value = response.data.sort(
-        (a: Tratamiento, b: Tratamiento) => a.id_tratamiento - b.id_tratamiento,
+        (a: Tratamiento, b: Tratamiento) => (a.id_tratamiento ?? 0) - (b.id_tratamiento ?? 0),
       )
     } catch (error) {
       console.error('Error fetching tratamientos:', error)
@@ -93,7 +93,7 @@ export const useServiceConsultorios = () => {
 
       // Transforma la respuesta para cambiar nombre_tratamiento a nombre
       const tratamientos =
-        response.data?.map((tratamiento: Tratamiento) => ({
+        response.data?.map((tratamiento: TratamientoApi) => ({
           ...tratamiento,
           nombre: tratamiento.nombre_tratamiento, // Mapea nombre_tratamiento a nombre
           // Elimina el campo nombre_tratamiento si lo deseas (opcional)

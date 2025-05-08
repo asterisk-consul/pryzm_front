@@ -1,4 +1,5 @@
 import axios from '@/config/axios'
+import type { AxiosError } from 'axios'
 
 import type { Tratamiento } from '../interfaces/tratamientosInterface'
 
@@ -38,21 +39,44 @@ export const useServiceTratamientos = () => {
       console.error('Error al actualizar el tratamiento:', error)
     }
   }
+
   const eliminarTratamiento = async (tratamiento: Tratamiento) => {
     try {
       await axios.delete(`/tratamientos/${tratamiento.id_tratamiento}`)
-    } catch (error) {
-      if (error.response) {
-        // Manejar errores específicos del backend
-        if (error.response.status === 400) {
-          alert(error.response.data.message) // Mostrar mensaje de error
-        } else if (error.response.status === 404) {
-          alert('Tratamiento no encontrado')
-        } else {
-          alert('Error al eliminar el tratamiento')
+    } catch (error: unknown) {
+      if (error instanceof Error) {
+        // Error nativo de JavaScript
+        console.error('Error:', error.message)
+        alert('Error de conexión')
+        return
+      }
+
+      // Type assertion para error de Axios
+      const axiosError = error as AxiosError<{
+        message?: string
+      }>
+
+      if (axiosError.response) {
+        // Manejo de errores HTTP
+        switch (axiosError.response.status) {
+          case 400:
+            alert(axiosError.response.data?.message || 'Datos inválidos')
+            break
+          case 404:
+            alert('Tratamiento no encontrado')
+            break
+          case 500:
+            alert('Error en el servidor')
+            break
+          default:
+            alert('Error al procesar la solicitud')
         }
+      } else if (axiosError.request) {
+        // La solicitud fue hecha pero no hubo respuesta
+        alert('No se recibió respuesta del servidor')
       } else {
-        console.error('Error desconocido:', error.message)
+        // Error al configurar la solicitud
+        alert('Error al enviar la solicitud')
       }
     }
   }
