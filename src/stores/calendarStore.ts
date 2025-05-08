@@ -112,7 +112,7 @@ export const useCalendarStore = defineStore('calendar', () => {
 
     if (currentView.value === 'month') {
       const now = new Date()
-      calendar.setDate(new Date(now.getFullYear(), now.getMonth(), 1)) // Primer día del mes
+      calendar?.setDate(new Date(now.getFullYear(), now.getMonth(), 1)) // Primer día del mes
     } else {
       calendar?.today()
     }

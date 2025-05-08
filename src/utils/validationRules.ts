@@ -11,11 +11,13 @@
  * (true si es válido, string con mensaje de error si no es válido)
  */
 
+type ValidationRule = (value: string) => true | string
+
 /**
  * REGLAS PARA NOMBRES (nameRules)
  * Valida que un campo de nombre cumpla con requisitos básicos
  */
-export const nameRules = [
+export const nameRules: ValidationRule[] = [
   // Validación: Campo requerido
   (value) => !!value || 'Debe colocar el nombre',
 
@@ -27,7 +29,7 @@ export const nameRules = [
  * REGLAS PARA EMAIL (emailRules)
  * Valida que un campo de email tenga formato correcto
  */
-export const emailRules = [
+export const emailRules: ValidationRule[] = [
   // Validación: Campo requerido
   (value) => !!value || 'Ingrese su E-mail',
 
@@ -39,7 +41,7 @@ export const emailRules = [
  * REGLAS PARA CONTRASEÑA (passwordRules)
  * Valida requisitos básicos de contraseñas
  */
-export const passwordRules = [
+export const passwordRules: ValidationRule[] = [
   // Validación: Campo requerido
   (value) => !!value || 'Debe ingresar su contraseña',
 

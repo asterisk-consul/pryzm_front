@@ -41,6 +41,8 @@ export const useCalendarEventsStore = defineStore('calendarEvents', () => {
 
   const eventsForMonth = computed(() => {
     return formattedEvents.value.filter((event) => {
+      if (!event.start) return false // Descarta eventos sin fecha
+
       const eventDate = new Date(event.start)
       return (
         eventDate.getMonth() === currentMonth.value && eventDate.getFullYear() === currentYear.value
@@ -50,8 +52,8 @@ export const useCalendarEventsStore = defineStore('calendarEvents', () => {
   const calendars = computed<Calendar[]>(() => {
     return consultoriosDisponibles.value.map((consultorio, index) => ({
       id: `consultorio-${index}`,
-      name: consultorio,
-      color: getColorForConsultorio(consultorio), // Función para asignar colores
+      name: consultorio || '', // Convierte null a string vacía
+      color: getColorForConsultorio(consultorio || ''),
     }))
   })
 
