@@ -20,7 +20,6 @@
   >
     <DialogCrearEditar
       :tratamiento="tratamientoActivo || {}"
-      :tratamiento="tratamientoActivo || {}"
       :is-edit="isEdit"
       @close-dialog="dialogs.tratamientos = false"
       @create-tratamiento="createTratamiento"
@@ -36,7 +35,6 @@
     transition="dialog-transition"
   >
     <DialogEliminar
-      :tratamiento-activo="tratamientoActivo || {}"
       :tratamiento-activo="tratamientoActivo || {}"
       @confirmar-eliminacion="confirmarEliminacion"
       @cerrar-dialogo="dialogs.eliminar = false"
@@ -87,7 +85,6 @@ const handleCreateTratamiento = () => {
 }
 
 const abrirDialogborrar = (tratamiento: Tratamiento) => {
-const abrirDialogborrar = (tratamiento: Tratamiento) => {
   tratamientoActivo.value = tratamiento
   dialogs.value.eliminar = true
 }
@@ -103,7 +100,6 @@ const confirmarEliminacion = async () => {
   await store.cargarDatos()
 }
 
-const createTratamiento = async (tratamiento: Tratamiento) => {
 const createTratamiento = async (tratamiento: Tratamiento) => {
   const { nombre, descripcion, costo, duracion, color } = tratamiento
   if (isEdit.value) {
