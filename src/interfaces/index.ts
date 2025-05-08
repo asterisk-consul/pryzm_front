@@ -3,7 +3,6 @@ import type { Tratamiento } from './tratamientosInterface'
 import type { Turno } from './turnosInterface'
 import type { Consultorio } from './consultorioInterface'
 import type { Evento, FormattedEvent } from './calendarInterface'
-import { TratamientoApi } from './tratamientosInterface'
 
 // Tipos y interfaces del calendario
 export type { CalendarView, ViewType } from './calendarInterface'

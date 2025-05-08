@@ -124,11 +124,11 @@ const props = defineProps({
 
 const { isEdit, tratamiento } = toRefs(props)
 
-const nombre = ref(tratamiento.value?.nombre || '')
-const descripcion = ref(tratamiento.value?.descripcion || '')
-const costo = ref(tratamiento.value?.costo || 0)
-const duracion = ref(tratamiento.value?.duracion || 0)
-const selectedColor = ref(tratamiento.value?.color || '#989898')
+const nombre = ref(tratamiento?.value?.nombre || '')
+const descripcion = ref(tratamiento?.value?.descripcion || '')
+const costo = ref(tratamiento?.value?.costo || 0)
+const duracion = ref(tratamiento?.value?.duracion || 0)
+const selectedColor = ref(tratamiento?.value?.color || '#989898')
 const menu = ref(false)
 const buttonColors = ref(['#8c57ff', '#0d9394', '#ffb400', '#ff4c51', '#16b1ff'])
 
@@ -139,7 +139,7 @@ const selectColor = (color: string) => {
   menu.value = false // Cierra el menú después de seleccionar un color
 }
 // Verifica si el color está seleccionado
-const isColorSelected = (btnColor) => {
+const isColorSelected = (btnColor: string) => {
   return selectedColor.value === btnColor || !buttonColors.value.includes(selectedColor.value)
 }
 const iconColor = computed(() => {
@@ -156,7 +156,7 @@ const iconColor = computed(() => {
 // }
 
 const formData = computed(() => ({
-  id_tratamiento: tratamiento.value?.id_tratamiento,
+  id_tratamiento: tratamiento?.value?.id_tratamiento,
   nombre: nombre.value,
   descripcion: descripcion.value,
   costo: costo.value,
