@@ -19,6 +19,12 @@ const routes: Array<RouteRecordRaw> = [
     meta: { requiresAuth: true }, // Protección de autenticación
   },
   {
+    path: '/caja',
+    name: 'caja',
+    component: import('../views/PuntoCobro.vue'),
+    meta: { requiresAuth: true }, // Protección de autenticación
+  },
+  {
     path: '/profile',
     name: 'profile',
     component: () => import('../views/ProfileView.vue'),

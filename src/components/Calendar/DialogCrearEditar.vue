@@ -63,6 +63,24 @@
             </v-list-item>
           </template>
         </v-select>
+        <v-select
+          label="Estado"
+          :items="estadosTurno"
+          item-title="nombre"
+          item-value="estado"
+          v-model="nuevoTurno.estado"
+          outlined
+          dense
+          required
+        >
+          <template v-slot:item="{ props, item }">
+            <v-list-item v-bind="props" :title="item.raw.nombre" :prepend-avatar="item.raw.color">
+              <template v-slot:prepend>
+                <v-avatar :color="item.raw.color" size="12" class="mr-2"></v-avatar>
+              </template>
+            </v-list-item>
+          </template>
+        </v-select>
 
         <!-- Selector de Fecha -->
         <v-menu
@@ -148,19 +166,22 @@
 
 <script setup lang="ts">
 import { useTheme } from 'vuetify'
-
 import { storeToRefs } from 'pinia'
 import type { Turno, Consultorio, Tratamiento, Paciente } from '@/interfaces'
 import { ref, computed, toRefs, onMounted, watch } from 'vue'
-
 import { formatDisplayDate, formatHeaderDate } from '@/utils/formatDateTime'
-
 import { useConsultoriosStore } from '@/stores/consultoriosStores'
 
 const theme = useTheme()
 
 const consultoriosStore = useConsultoriosStore()
 const { tratamientosPorConsultorio } = storeToRefs(consultoriosStore)
+const estadosTurno = [
+  { nombre: 'Pendiente', estado: 'pendiente' },
+  { nombre: 'Confirmado', estado: 'confirmado' },
+  { nombre: 'Cancelado', estado: 'cancelado' },
+  { nombre: 'Finalizado', estado: 'finalizado' },
+]
 
 const props = defineProps<{
   modelValue: boolean
@@ -169,6 +190,8 @@ const props = defineProps<{
   pacientes: Paciente[]
   turnoActivo?: Turno
 }>()
+
+
 
 const tratamientosDisponibles = ref<Tratamiento[]>([])
 const nuevoTurno = ref<Turno>({
@@ -187,6 +210,8 @@ const nuevoTurno = ref<Turno>({
   costo_tratamiento: null, // Valor predeterminado
   color_tratamiento: '', // Valor predeterminado
 })
+
+
 const menuFecha = ref(false)
 const menuHora = ref(false)
 const tratamientoSeleccionado = ref({

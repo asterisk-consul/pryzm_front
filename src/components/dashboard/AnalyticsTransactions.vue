@@ -74,7 +74,7 @@ const turnosPendientes = computed(() =>
 )
 
 const turnosAprobados = computed(() =>
-  store.turnos.filter(t => t.estado?.toLowerCase() === 'aprobado').length
+  store.turnos.filter(t => t.estado?.toLowerCase() === 'confirmado').length
 )
 
 const turnosFinalizados = computed(() =>
@@ -95,7 +95,7 @@ const statistics = computed(() => [
     color: 'warning',
   },
   {
-    title: 'Aprobados',
+    title: 'Confirmados',
     stats: turnosAprobados.value,
     icon: 'ri-checkbox-circle-line',
     color: 'success',
