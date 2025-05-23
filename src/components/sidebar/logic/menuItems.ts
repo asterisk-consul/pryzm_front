@@ -9,6 +9,12 @@ export const menuItems = [
     icon: 'mdi-home',
     title: 'Home',
   },
+ {
+  to: '/caja',
+  icon: 'mdi-cash-register',
+  title: 'Punto de Cobro',
+},
+
   {
     to: '/turnos',
     icon: 'mdi-calendar-check',

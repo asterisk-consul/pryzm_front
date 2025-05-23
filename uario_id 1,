@@ -1,0 +1,46 @@
+* [33me85e00a[m[33m ([m[1;36mHEAD -> [m[1;32merp[m[33m)[m cambios erp
+*   [33m27c9d57[m[33m ([m[1;32mvue3[m[33m)[m Resolviendo conflictos de merge
+[32m|[m[33m\[m  
+[32m|[m * [33md1afd70[m[33m ([m[1;31morigin/vue3[m[33m)[m se realizan cambios
+[32m|[m * [33mc8d7683[m se finaliza calendario
+[32m|[m * [33m515e3b9[m FIX: calendarview, ahora queda guardada la ultima vista siempre y cuando no sea agenda xq rompe la app
+[32m|[m * [33m302de15[m se reailizan cambios esteticos en calendario
+* [33m|[m [33mac9465e[m cambiio de turnosStore
+* [33m|[m [33m791c39f[m Resuelvo conflicto usando versión del servidor
+[34m|[m[33m\[m[33m|[m 
+[34m|[m * [33m7435d6a[m se realizan cambios grnades en calendar se termina los eventos y vistas falta algunos detalles de styles como los instervalos, etc
+* [35m|[m [33me8f40ac[m dashboard
+[35m|[m[35m/[m  
+* [33mb227267[m se componetizo consultorio, tratatientos y se creo ComponenteView.vue
+* [33m2db97ee[m cambioas para vue3
+[35m|[m * [33m3463b83[m[33m ([m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m fix:calendar se le agraga la funcion para intervalos de minutos y se realiza el build
+[35m|[m * [33md41ce3d[m build  05-03-2025
+[35m|[m * [33m4e29014[m fix: colores calendario, eliminar se agrega un dialog previo a eliminar y en consutorio ya puede elimiar las chips
+[35m|[m * [33m801b861[m build 24/02/2025
+[35m|[m * [33mae235eb[m se realizan cambios en styles de tooltip de calendario
+[35m|[m * [33mac2015b[m fix MyCalendar, se agrena colers dark y light, mas algunos ajustes de styles
+[35m|[m * [33m4adee09[m fix: Mycelndar.vue + algunas funciones
+[35m|[m [36m|[m * [33m4e74fee[m[33m ([m[1;31morigin/agus[m[33m)[m algunos cambios
+[35m|[m [36m|[m * [33m94f3891[m merge main agus
+[35m|[m [36m|[m[35m/[m[36m|[m 
+[35m|[m[35m/[m[36m|[m[36m/[m  
+[35m|[m * [33m2e93392[m se realizan cambios para que funcone de mera localhost:3003
+[35m|[m * [33m4349b9d[m se sube carpeta de dist
+[35m|[m * [33m19a5374[m se realiza calendario y consultorios
+[35m|[m * [33ma7cb9e6[m se corrige error de crear consultorio
+[35m|[m * [33m2d9a9ef[m se realiza consultorio y tratamientos se debe terminar turnos
+[35m|[m * [33m494ae39[m se realizan cambio en my calendar y consultorios
+[35m|[m * [33ma6f18c4[m se realiza vista consultorio faltando configurar alertas de errores
+[35m|[m * [33m31f2844[m se realizan dialog y cards de tratamientos
+[35m|[m * [33m813fe48[m Se realiza visa consultorio falta eliminar y tratamientos
+[35m|[m * [33m23d91de[m se realiza calendarios y consultorios
+[35m|[m * [33m37424c5[m se realiza calendario con 4 vistas
+[35m|[m * [33m6a87adc[m se realizan cambios en la baseURL del main para que funcione de manera local
+* [1;33m|[m [33me373e16[m cambios para realizar rama nueva con vue3
+* [1;33m|[m [33m7c36c85[m cambios en qr
+* [1;33m|[m [33m859586a[m modificaciones en archvo notificaciones.vue
+* [1;33m|[m [33mf48e729[m se divide en componentes Singin, Singup, las alertas en MyAlerts.vue, y los inputs de los forumulario en BaseInput.vue
+* [1;33m|[m [33md34e055[m se realiza nueva rama
+[1;33m|[m[1;33m/[m  
+* [33m2f7dad1[m Segundo commit
+* [33m8efdb9d[m Primer commit
