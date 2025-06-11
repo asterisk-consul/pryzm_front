@@ -10,7 +10,7 @@
           <div class="mt-2">🧾 Total Facturado Hoy: <strong>${{ totalFacturado }}</strong></div>
 
           <div class="mt-4 d-flex gap-2">
-            <VBtn v-if="!cajaAbierta" color="primary" @click="dialogAbrir = true">🔓 Abrir Caja</VBtn>
+            <VBtn v-if="!cajaAbierta" color="primary" @click="dialogAbrir = true">🔓 Abrir punto de cobro</VBtn>
             <VBtn v-if="cajaAbierta" color="error" @click="cerrarCaja">🔐 Cerrar Caja</VBtn>
           </div>
         </VCard>
