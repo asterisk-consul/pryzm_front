@@ -16,7 +16,7 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/home',
     name: 'home',
-    component: import('../views/HomeView.vue'),
+    component: () => import('../views/HomeView.vue'),
     meta: { requiresAuth: true }, // Protección de autenticación
   },
   {
@@ -37,7 +37,6 @@ const routes: Array<RouteRecordRaw> = [
     component: () => import('../components/Notificaciones/MyNotificaciones.vue'),
     meta: { requiresAuth: true },
   },
-
   {
     path: '/pacientes',
     name: 'pacientes',
@@ -58,9 +57,25 @@ const routes: Array<RouteRecordRaw> = [
   },
 ]
 
+// Configurar la base del router según el entorno
+const getBaseURL = () => {
+  // Si estamos en desarrollo local, usar '/'
+  if (import.meta.env.DEV) {
+    return '/'
+  }
+
+  // Si VITE_APP_ENV está definido como 'dev', usar '/dev/'
+  if (import.meta.env.VITE_APP_ENV === 'dev') {
+    return '/dev/'
+  }
+
+  // Por defecto usar '/' para producción
+  return '/'
+}
+
 // Creamos la instancia del router
 const router = createRouter({
-  history: createWebHistory('/'),
+  history: createWebHistory(getBaseURL()),
   routes,
 })
 
