@@ -40,7 +40,7 @@ jobs:
           scp -i private_key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
 
       # ✅ Extraer y hacer deploy atómico
-      - name: Atomic Deploy
+      - name: Simple Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
@@ -48,32 +48,20 @@ jobs:
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
             DEPLOY_DIR="${{ secrets.VPS_PATH }}"
-            TEMP_DIR="/tmp/deploy_$(date +%s)"
 
-            # 1. Crear directorio temporal
-            mkdir -p "$TEMP_DIR" || exit 1
+            echo "📁 Creando directorio de deploy si no existe..."
+            mkdir -p "$DEPLOY_DIR" || exit 1
 
-            # 2. Extraer paquete al directorio temporal
-            if ! tar -xzf /tmp/deploy.tar.gz -C "$TEMP_DIR"; then
-                echo "❌ Error extrayendo deploy.tar.gz"
-                rm -rf "$TEMP_DIR"
+            echo "🗑️ Borrando contenido anterior..."
+            rm -rf "$DEPLOY_DIR"/*
+
+            echo "📦 Extrayendo nuevo paquete..."
+            tar -xzf /tmp/deploy.tar.gz -C "$DEPLOY_DIR" || {
+                echo "❌ Error al extraer deploy.tar.gz"
                 exit 1
-            fi
-
-            # 3. Reemplazo atómico
-            if [ -d "$DEPLOY_DIR" ]; then
-                BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%s)"
-                mv "$DEPLOY_DIR" "$BACKUP_DIR" || exit 1
-            fi
-
-            mv "$TEMP_DIR" "$DEPLOY_DIR" || {
-                echo "❌ Error en deploy atómico";
-                [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR" "$DEPLOY_DIR";
-                exit 1;
             }
 
-            # 4. Limpieza
-            [ -d "$BACKUP_DIR" ] && rm -rf "$BACKUP_DIR"
+            echo "🧼 Limpiando archivos temporales..."
             rm -f /tmp/deploy.tar.gz
-            chmod -R 755 "$DEPLOY_DIR"
-            echo "✅ Deploy atómico completado"
+
+            echo "✅ Deploy completado correctamente"
