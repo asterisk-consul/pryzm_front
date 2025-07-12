@@ -19,23 +19,27 @@ jobs:
       - name: Install dependencies
         run: npm install
 
-      #   - name: Type-check
-      #     run: npm run type-check -- --noEmit # Detiene el proceso si hay errores TS críticos
-
       - name: Build project (ignore warnings)
-        run: npm run build-only # Permite build con warnings
+        run: npm run build-only
 
-      # ✅ Subir carpeta dist/ al servidor
-      - name: Upload dist/ to server
+      # ✅ Crear paquete tar.gz con dist/
+      - name: Create deploy package
         run: |
-          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
-          chmod 600 key.pem
-          scp -r -i key.pem dist/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy_dist
-        env:
-          VPS_HOST: ${{ secrets.VPS_HOST }}
-          VPS_USER: ${{ secrets.VPS_USER }}
-          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+          tar -czf deploy.tar.gz -C dist .
 
+      # ✅ Agregar la clave privada SSH
+      - name: Add SSH key
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      # ✅ Subir deploy.tar.gz al servidor
+      - name: Upload deploy package
+        run: |
+          echo "📦 Subiendo deploy.tar.gz al VPS..."
+          scp -i private_key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
+
+      # ✅ Extraer y hacer deploy atómico
       - name: Atomic Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
@@ -49,9 +53,9 @@ jobs:
             # 1. Crear directorio temporal
             mkdir -p "$TEMP_DIR" || exit 1
 
-            # 2. Copiar contenido de dist/ (asumiendo que ya está en el servidor)
-            if ! cp -r dist/* "$TEMP_DIR"; then
-                echo "❌ Error copiando a directorio temporal"
+            # 2. Extraer paquete al directorio temporal
+            if ! tar -xzf /tmp/deploy.tar.gz -C "$TEMP_DIR"; then
+                echo "❌ Error extrayendo deploy.tar.gz"
                 rm -rf "$TEMP_DIR"
                 exit 1
             fi
@@ -70,5 +74,6 @@ jobs:
 
             # 4. Limpieza
             [ -d "$BACKUP_DIR" ] && rm -rf "$BACKUP_DIR"
+            rm -f /tmp/deploy.tar.gz
             chmod -R 755 "$DEPLOY_DIR"
             echo "✅ Deploy atómico completado"
