@@ -25,28 +25,39 @@ jobs:
       - name: Build project (ignore warnings)
         run: npm run build-only # Permite build con warnings
 
-      - name: Deploy to VPS
+      - name: Atomic Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ${{ secrets.VPS_PATH }} || exit 1
+            DEPLOY_DIR="${{ secrets.VPS_PATH }}"
+            TEMP_DIR="/tmp/deploy_$(date +%s)"
 
-            # Backup rápido de archivos críticos (opcional)
-            [ -f .env ] && cp .env .env.backup
+            # 1. Crear directorio temporal
+            mkdir -p "$TEMP_DIR" || exit 1
 
-            # Limpieza segura (excluye .env, .git, y archivos ocultos)
-            find . -mindepth 1 \( ! -name '.*' ! -name '*.backup' \) -exec rm -rf {} +
-
-            # Copia desde dist/ con manejo de errores
-            if ! mv dist/* ./; then
-              echo "⚠️ Error moviendo dist/*. Recuperando backup..."
-              [ -f .env.backup ] && mv .env.backup .env
-              exit 1
+            # 2. Copiar contenido de dist/ (asumiendo que ya está en el servidor)
+            if ! cp -r dist/* "$TEMP_DIR"; then
+                echo "❌ Error copiando a directorio temporal"
+                rm -rf "$TEMP_DIR"
+                exit 1
             fi
 
-            rm -rf dist/
-            chmod -R 755 .
-            echo "✅ Despliegue completado"
+            # 3. Reemplazo atómico
+            if [ -d "$DEPLOY_DIR" ]; then
+                BACKUP_DIR="${DEPLOY_DIR}_backup_$(date +%s)"
+                mv "$DEPLOY_DIR" "$BACKUP_DIR" || exit 1
+            fi
+
+            mv "$TEMP_DIR" "$DEPLOY_DIR" || {
+                echo "❌ Error en deploy atómico";
+                [ -d "$BACKUP_DIR" ] && mv "$BACKUP_DIR" "$DEPLOY_DIR";
+                exit 1;
+            }
+
+            # 4. Limpieza
+            [ -d "$BACKUP_DIR" ] && rm -rf "$BACKUP_DIR"
+            chmod -R 755 "$DEPLOY_DIR"
+            echo "✅ Deploy atómico completado"
