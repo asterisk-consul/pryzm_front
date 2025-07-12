@@ -11,23 +11,42 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Build project
-        run: |
-          npm install
-          npm run build
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
 
-      - name: Clean server and deploy dist/
+      - name: Install dependencies
+        run: npm install
+
+      - name: Type-check
+        run: npm run type-check -- --noEmit # Detiene el proceso si hay errores TS críticos
+
+      - name: Build project (ignore warnings)
+        run: npm run build -- --noEmitOnError false # Permite build con warnings
+
+      - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USER }}
           key: ${{ secrets.VPS_SSH_KEY }}
           script: |
-            cd ${{ secrets.VPS_PATH }}
-            # Elimina TODO excepto la carpeta actual (.) y dist/ (si existe)
-            find . -mindepth 1 ! -path './dist*' -exec rm -rf {} +
-            # Mueve el contenido de dist/ al directorio raíz
-            mv dist/* ./
+            cd ${{ secrets.VPS_PATH }} || exit 1
+
+            # Backup rápido de archivos críticos (opcional)
+            [ -f .env ] && cp .env .env.backup
+
+            # Limpieza segura (excluye .env, .git, y archivos ocultos)
+            find . -mindepth 1 \( ! -name '.*' ! -name '*.backup' \) -exec rm -rf {} +
+
+            # Copia desde dist/ con manejo de errores
+            if ! mv dist/* ./; then
+              echo "⚠️ Error moviendo dist/*. Recuperando backup..."
+              [ -f .env.backup ] && mv .env.backup .env
+              exit 1
+            fi
+
             rm -rf dist/
-            # Ajusta permisos (opcional)
-            chmod -R 755 ./
+            chmod -R 755 .
+            echo "✅ Despliegue completado"
