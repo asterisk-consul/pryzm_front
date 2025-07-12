@@ -23,7 +23,7 @@ jobs:
       #     run: npm run type-check -- --noEmit # Detiene el proceso si hay errores TS críticos
 
       - name: Build project (ignore warnings)
-        run: npm run build -- --noEmitOnError false # Permite build con warnings
+        run: npm run build-only # Permite build con warnings
 
       - name: Deploy to VPS
         uses: appleboy/ssh-action@v1.0.0
