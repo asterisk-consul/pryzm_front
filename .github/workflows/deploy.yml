@@ -25,6 +25,17 @@ jobs:
       - name: Build project (ignore warnings)
         run: npm run build-only # Permite build con warnings
 
+      # ✅ Subir carpeta dist/ al servidor
+      - name: Upload dist/ to server
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > key.pem
+          chmod 600 key.pem
+          scp -r -i key.pem dist/* ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy_dist
+        env:
+          VPS_HOST: ${{ secrets.VPS_HOST }}
+          VPS_USER: ${{ secrets.VPS_USER }}
+          VPS_SSH_KEY: ${{ secrets.VPS_SSH_KEY }}
+
       - name: Atomic Deploy
         uses: appleboy/ssh-action@v1.0.0
         with:
