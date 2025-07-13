@@ -1,0 +1,67 @@
+name: Deploy Main dist/
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build project (ignore warnings)
+        run: npm run build-only
+
+      # ✅ Crear paquete tar.gz con dist/
+      - name: Create deploy package
+        run: |
+          tar -czf deploy.tar.gz -C dist .
+
+      # ✅ Agregar la clave privada SSH
+      - name: Add SSH key
+        run: |
+          echo "${{ secrets.VPS_SSH_KEY }}" > private_key.pem
+          chmod 600 private_key.pem
+
+      # ✅ Subir deploy.tar.gz al servidor
+      - name: Upload deploy package
+        run: |
+          echo "📦 Subiendo deploy.tar.gz al VPS..."
+          scp -i private_key.pem -o StrictHostKeyChecking=no deploy.tar.gz ${{ secrets.VPS_USER }}@${{ secrets.VPS_HOST }}:/tmp/deploy.tar.gz
+
+      # ✅ Extraer y hacer deploy atómico
+      - name: Simple Deploy
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          script: |
+            DEPLOY_DIR="${{ secrets.VPS_PATH_MAIN }}"
+
+            echo "📁 Creando directorio de deploy si no existe..."
+            mkdir -p "$DEPLOY_DIR" || exit 1
+
+            echo "🗑️ Borrando contenido anterior..."
+            rm -rf "$DEPLOY_DIR"/*
+
+            echo "📦 Extrayendo nuevo paquete..."
+            tar -xzf /tmp/deploy.tar.gz -C "$DEPLOY_DIR" || {
+                echo "❌ Error al extraer deploy.tar.gz"
+                exit 1
+            }
+
+            echo "🧼 Limpiando archivos temporales..."
+            rm -f /tmp/deploy.tar.gz
+
+            echo "✅ Deploy completado correctamente"
